@@ -1,0 +1,12 @@
+{
+  "name": "copy-gh-title-url",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.19.0",
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/check.js",
+    "zip": "pnpm run check && mkdir -p dist && rm -f dist/copy-gh-title-url.zip && zip -r dist/copy-gh-title-url.zip manifest.json _locales src -x '*.DS_Store'"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "menuTitle": {
+    "message": "GitHub のタイトルと URL をコピー"
+  },
+  "toastCopied": {
+    "message": "コピーしました"
+  },
+  "toastUnsupportedPage": {
+    "message": "Issue、Pull Request、Discussion のページではありません"
+  },
+  "toastTitleNotFound": {
+    "message": "タイトルを取得できませんでした"
+  },
+  "toastCopyFailed": {
+    "message": "クリップボードへのコピーに失敗しました"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "menuTitle": {
+    "message": "Copy GitHub title and URL"
+  },
+  "toastCopied": {
+    "message": "Copied!"
+  },
+  "toastUnsupportedPage": {
+    "message": "This page is not an issue, pull request, or discussion."
+  },
+  "toastTitleNotFound": {
+    "message": "Could not find the title on this page."
+  },
+  "toastCopyFailed": {
+    "message": "Failed to copy to the clipboard."
+  }
+}
