@@ -15,7 +15,8 @@ import {
 } from "../../lib/rules/store";
 import { type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft, toDraft } from "./draft";
-import { isValidSelector, type MessageKey, t } from "./i18n";
+import { type MessageKey, t } from "../../lib/i18n";
+import { isValidSelector } from "./selector";
 import { IssueItem, RuleForm } from "./RuleForm";
 
 type Editing = { draft: RuleDraft; isNew: boolean } | null;

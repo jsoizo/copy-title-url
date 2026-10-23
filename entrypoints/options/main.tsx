@@ -1,7 +1,7 @@
 import { render } from "preact";
-import { browser } from "wxt/browser";
+import { setDocumentLanguage, t } from "../../lib/i18n";
 import { App } from "./App";
 
-document.documentElement.lang = browser.i18n.getUILanguage();
-document.title = browser.i18n.getMessage("optionsTitle");
+setDocumentLanguage();
+document.title = t("optionsTitle");
 render(<App />, document.getElementById("app")!);

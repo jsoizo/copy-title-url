@@ -1,34 +1,27 @@
-import type { ExtractedTitle } from "./plan";
-
-export type ToastKind = "success" | "warning" | "error";
+import type { MessageKey } from "./i18n";
 
 export type Toast = {
-  kind: ToastKind;
-  message: string;
+  kind: "success" | "warning" | "error";
+  // 文言はトーストを表示する側で解決する
+  messageKey: MessageKey;
 };
 
-export type CopierRequest =
-  | { type: "extractTitle"; selectors: string[] }
-  | { type: "copy"; text: string; toast: Toast; failureMessage: string }
-  | { type: "notify"; toast: Toast };
+export const TOAST_TITLE_NOT_FOUND: Toast = { kind: "error", messageKey: "toastTitleNotFound" };
+export const TOAST_COPY_FAILED: Toast = { kind: "error", messageKey: "toastCopyFailed" };
+export const TOAST_FAILED: Toast = { kind: "error", messageKey: "toastFailed" };
 
-export type CopierResponse<T extends CopierRequest["type"]> = T extends "extractTitle"
-  ? ExtractedTitle
-  : T extends "copy"
-    ? { copied: boolean }
-    : null;
+export const toastAfterCopy = (toast: Toast, copied: boolean): Toast => (copied ? toast : TOAST_COPY_FAILED);
 
-// background が executeScript の func で書き込み、直後に注入した copier が読み出す
-export const COPIER_REQUEST_KEY = "__copyTitleUrlRequest";
+export type ExtractedTitle = {
+  element: string | null;
+  document: string;
+};
 
-// ポップアップはフォーカスを持つため、クリップボードへの書き込みだけをポップアップで行う
-export type PreparedCopy =
-  | { status: "ready"; text: string; toast: Toast; failureMessage: string }
-  | { status: "titleNotFound"; toast: Toast }
-  | { status: "failed" };
+// copier がページの isolated world に定義する API。引数と戻り値は executeScript で受け渡せる値に限る
+export type CopierApi = {
+  extractTitle(selectors: string[]): ExtractedTitle;
+  copy(text: string, toast: Toast): Promise<boolean>;
+  notify(toast: Toast): void;
+};
 
-export type PopupRequest =
-  | { type: "popup:prepare"; tabId: number; pageUrl: string; format: "plain" | "markdown" }
-  | { type: "popup:notify"; tabId: number; toast: Toast };
-
-export type NotifyResult = { shown: boolean };
+export const COPIER_API_KEY = "__copyTitleUrl";

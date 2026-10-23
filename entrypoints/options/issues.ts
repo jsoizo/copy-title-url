@@ -1,5 +1,5 @@
 import type { Issue } from "../../lib/rules/validate";
-import type { MessageKey } from "./i18n";
+import type { MessageKey } from "../../lib/i18n";
 
 export type Translate = (key: MessageKey, substitutions?: string[]) => string;
 

@@ -1,5 +1,5 @@
-import type { Toast } from "./messages";
-import type { ExtractedTitle } from "./plan";
+import { browser } from "wxt/browser";
+import type { ExtractedTitle, Toast } from "./messages";
 
 const TOAST_HOST_ID = "copy-title-url-toast";
 
@@ -50,7 +50,7 @@ const TOAST_COLORS: Record<Toast["kind"], { background: string; color: string }>
   error: { background: "#cf222e", color: "#fff" },
 };
 
-export function showToast({ kind, message }: Toast): void {
+export function showToast({ kind, messageKey }: Toast): void {
   document.getElementById(TOAST_HOST_ID)?.remove();
   const host = document.createElement("div");
   host.id = TOAST_HOST_ID;
@@ -76,7 +76,7 @@ export function showToast({ kind, message }: Toast): void {
   const toast = document.createElement("div");
   toast.className = "toast";
   toast.setAttribute("role", "status");
-  toast.textContent = message;
+  toast.textContent = browser.i18n.getMessage(messageKey);
   shadow.append(style, toast);
   document.documentElement.append(host);
   setTimeout(() => host.remove(), kind === "success" ? 3000 : 5000);

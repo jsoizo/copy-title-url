@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { Issue } from "../../lib/rules/validate";
 import { type ConditionDraft, emptyCondition, type RuleDraft } from "./draft";
-import { t } from "./i18n";
+import { t } from "../../lib/i18n";
 import { fieldKey, issueLocation, issueMessage } from "./issues";
 
 type Props = {

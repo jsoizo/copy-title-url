@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { CopyFormat } from "../lib/format";
-import { type CopyPlan, type ExtractedTitle, planCopy } from "../lib/plan";
+import type { ExtractedTitle } from "../lib/messages";
+import { type CopyPlan, planCopy } from "../lib/plan";
 import { BUILTIN_RULES } from "../lib/rules/builtin";
 import { matchRules } from "../lib/rules/match";
 import type { Rule } from "../lib/rules/schema";

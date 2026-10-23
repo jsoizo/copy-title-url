@@ -192,7 +192,7 @@
     "message": "Cancel"
   },
   "saveFailed": {
-    "message": "Fix the errors below and save again."
+    "message": "Fix the errors and save again."
   },
   "quotaItemTooLarge": {
     "message": "This rule is too large to save (limit: 8 KB)."

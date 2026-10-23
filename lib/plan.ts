@@ -1,10 +1,6 @@
 import { type CopyFormat, formatOutput, normalizeTitle, renderTemplate, stripTitle } from "./format";
+import type { ExtractedTitle } from "./messages";
 import type { MatchResult } from "./rules/match";
-
-export type ExtractedTitle = {
-  element: string | null;
-  document: string;
-};
 
 export type CopyPlan = { status: "ok" | "fallback"; text: string } | { status: "titleNotFound" };
 
