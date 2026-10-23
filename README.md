@@ -109,7 +109,7 @@ Exported files contain your own rules, the built-in rules you edited, the order 
 
 ## Build from source
 
-You need Node.js 24 or later and pnpm 10. The tests use the global `URLPattern`, and `pnpm schema` runs a TypeScript file directly with Node.js; both need Node.js 24.
+You need Node.js 24 or later and pnpm 12. The tests use the global `URLPattern`, and `pnpm schema` runs a TypeScript file directly with Node.js; both need Node.js 24.
 
 ```bash
 git clone https://github.com/jsoizo/copy-title-url.git

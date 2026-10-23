@@ -14,9 +14,9 @@
   },
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
-    "node": ">=24"
+    "node": "^24.0.0 || >=26.0.0"
   },
   "scripts": {
     "postinstall": "wxt prepare",
@@ -36,13 +36,9 @@
     "@preact/preset-vite": "2.10.6",
     "@types/node": "^24.19.2",
     "@valibot/to-json-schema": "1.8.0",
-    "typescript": "5.9.3",
-    "vitest": "4.1.11",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5",
     "wxt": "0.21.4"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }
