@@ -40,15 +40,4 @@ export const BUILTIN_RULES: readonly Rule[] = [
     label: "{key} {title}",
     url: "https://{host}/browse/{key}",
   },
-  {
-    id: "kibela",
-    name: "Kibela",
-    match: [{ type: "urlpattern", pattern: String.raw`https://*.kibe.la/notes/:id(\d+){/*}?` }],
-    title: {
-      selectors: ["h1.noteHeader-title"],
-      documentTitleStrip: [String.raw`\s\|\s[^|]*Kibela$`],
-    },
-    label: "{title}",
-    url: "https://{host}/notes/{id}",
-  },
 ];

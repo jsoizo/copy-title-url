@@ -41,10 +41,10 @@ describe("有効なルール一覧", () => {
 
   test("order に無いルールは末尾に足し、存在しない ID は無視する", async () => {
     await browser.storage.sync.set({
-      settings: { version: 1, order: ["missing", "user-1", "kibela"], disabled: [] },
+      settings: { version: 1, order: ["missing", "user-1", "jira"], disabled: [] },
       "rule:user-1": userRule,
     });
-    expect((await entries()).map((entry) => entry.id)).toEqual(["user-1", "kibela", "github", "jira"]);
+    expect((await entries()).map((entry) => entry.id)).toEqual(["user-1", "jira", "github"]);
   });
 
   test("検証を通らない保存値は評価から外し、一覧にはエラー付きで残す", async () => {
@@ -75,10 +75,10 @@ describe("編集と組み込みへの復帰", () => {
 
 describe("組み込みの廃止", () => {
   test("拡張の更新で廃止された組み込みも、編集して保存してあればユーザー定義として残る", async () => {
-    await saveRule({ ...builtin("kibela"), name: "社内 Kibela" });
-    const remaining = BUILTIN_RULES.filter((rule) => rule.id !== "kibela");
-    const entry = resolveEntries(await readStored(), remaining).find((e) => e.id === "kibela");
-    expect(entry).toMatchObject({ kind: "user", enabled: true, rule: { name: "社内 Kibela" } });
+    await saveRule({ ...builtin("jira"), name: "My Jira" });
+    const remaining = BUILTIN_RULES.filter((rule) => rule.id !== "jira");
+    const entry = resolveEntries(await readStored(), remaining).find((e) => e.id === "jira");
+    expect(entry).toMatchObject({ kind: "user", enabled: true, rule: { name: "My Jira" } });
   });
 });
 
@@ -88,33 +88,33 @@ describe("並べ替えと有効・無効", () => {
     expect(await summary()).toEqual([
       { id: "github", kind: "builtin", enabled: true },
       { id: "jira", kind: "builtin", enabled: false },
-      { id: "kibela", kind: "builtin", enabled: true },
     ]);
-    expect(activeRules(await entries()).map((rule) => rule.id)).toEqual(["github", "kibela"]);
+    expect(activeRules(await entries()).map((rule) => rule.id)).toEqual(["github"]);
   });
 
   test("指定した位置へ動かし、範囲外の位置では動かさない", async () => {
-    await moveRule("kibela", 0);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["kibela", "github", "jira"]);
-    await moveRule("kibela", 2);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "kibela"]);
+    await saveRule(userRule);
+    await moveRule("user-1", 0);
+    expect((await entries()).map((entry) => entry.id)).toEqual(["user-1", "github", "jira"]);
+    await moveRule("user-1", 2);
+    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "user-1"]);
     await moveRule("github", 3);
     await moveRule("github", -1);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "kibela"]);
+    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "user-1"]);
   });
 });
 
 describe("エクスポートとインポート", () => {
   test("エクスポートは未編集の組み込みを含めず、インポートで同じ状態に戻る", async () => {
     await saveRule(userRule);
-    await saveRule({ ...builtin("jira"), name: "社内 Jira" });
-    await setEnabled("kibela", false);
+    await saveRule({ ...builtin("jira"), name: "My Jira" });
+    await setEnabled("github", false);
     const exported = buildExport(await readStored());
     expect(exported).toEqual({
       version: 1,
-      order: ["github", "jira", "kibela", "user-1"],
-      disabled: ["kibela"],
-      rules: [{ ...builtin("jira"), name: "社内 Jira" }, userRule],
+      order: ["github", "jira", "user-1"],
+      disabled: ["github"],
+      rules: [{ ...builtin("jira"), name: "My Jira" }, userRule],
     });
     const before = await summary();
 

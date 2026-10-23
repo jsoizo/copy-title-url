@@ -102,22 +102,6 @@ describe("Jira", () => {
   });
 });
 
-describe("Kibela", () => {
-  test("タイトルだけを表示名にし、URL を正規化する", () => {
-    expect(plan("https://example.kibe.la/notes/456#comment-1", { element: "リリース手順" })).toEqual({
-      status: "ok",
-      text: "リリース手順\nhttps://example.kibe.la/notes/456",
-    });
-  });
-
-  test("描画前で h1 が無ければ document.title から末尾のチーム名を削って代用する", () => {
-    expect(plan("https://example.kibe.la/notes/456", { document: "A | B | Example Kibela" })).toEqual({
-      status: "fallback",
-      text: "A | B\nhttps://example.kibe.la/notes/456",
-    });
-  });
-});
-
 describe("汎用コピー", () => {
   test("URL はクエリとハッシュを含めてそのまま使う", () => {
     const pageUrl = "https://example.com/a?b=1#c";

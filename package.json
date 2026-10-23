@@ -1,6 +1,17 @@
 {
   "name": "copy-title-url",
   "version": "0.2.0",
+  "description": "Copy the title and URL of the current page, formatted per site with configurable rules.",
+  "license": "MIT",
+  "author": "jsoizo",
+  "homepage": "https://github.com/jsoizo/copy-title-url#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsoizo/copy-title-url.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsoizo/copy-title-url/issues"
+  },
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.19.0",
@@ -14,7 +25,8 @@
     "zip": "wxt zip",
     "test": "vitest run",
     "check": "wxt prepare && tsc --noEmit",
-    "schema": "node scripts/generate-schema.ts"
+    "schema": "node scripts/generate-schema.ts",
+    "icons": "for size in 16 32 48 128; do rsvg-convert -w $size -h $size assets/icon.svg -o public/icon/$size.png; done"
   },
   "dependencies": {
     "preact": "10.29.8",
