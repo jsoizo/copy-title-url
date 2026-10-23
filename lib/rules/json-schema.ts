@@ -1,0 +1,10 @@
+import { toJsonSchema } from "@valibot/to-json-schema";
+import { ExportSchema } from "./schema.ts";
+
+// URLPattern や正規表現として解釈できるかなど、JSON Schema で表せない検証は validate.ts だけが行う
+export function buildJsonSchema() {
+  return {
+    ...toJsonSchema(ExportSchema),
+    title: "Copy Title and URL rules",
+  };
+}

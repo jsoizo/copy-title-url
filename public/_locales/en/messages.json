@@ -1,0 +1,251 @@
+{
+  "menuParent": {
+    "message": "Copy title and URL"
+  },
+  "menuCopyPlain": {
+    "message": "As plain text"
+  },
+  "menuCopyMarkdown": {
+    "message": "As Markdown link"
+  },
+  "menuOpenOptions": {
+    "message": "Open settings"
+  },
+  "toastCopied": {
+    "message": "Copied!"
+  },
+  "toastCopiedWithFallback": {
+    "message": "Copied using the page title because the title element was not found."
+  },
+  "toastTitleNotFound": {
+    "message": "Could not find the title on this page."
+  },
+  "toastCopyFailed": {
+    "message": "Failed to copy to the clipboard."
+  },
+  "toastFailed": {
+    "message": "Could not copy. See the extension's service worker console for details."
+  },
+  "optionsTitle": {
+    "message": "Copy Title and URL settings"
+  },
+  "optionsDescription": {
+    "message": "Rules are evaluated from the top. The first rule that matches the page URL formats the copied title and URL. Pages that match no rule are copied with the page title and URL as they are."
+  },
+  "rulesHeading": {
+    "message": "Rules"
+  },
+  "rulesOrderHelp": {
+    "message": "When several rules match a page, the one higher in the list is used; drag the handle to change the order."
+  },
+  "columnName": {
+    "message": "Name"
+  },
+  "columnKind": {
+    "message": "Type"
+  },
+  "columnEnabled": {
+    "message": "Enabled"
+  },
+  "columnActions": {
+    "message": "Actions"
+  },
+  "kindBuiltin": {
+    "message": "Built-in"
+  },
+  "kindEdited": {
+    "message": "Built-in (edited)"
+  },
+  "kindUser": {
+    "message": "Custom"
+  },
+  "invalidRule": {
+    "message": "Invalid"
+  },
+  "dragHandle": {
+    "message": "Drag to reorder. You can also focus this handle and press the up and down arrow keys."
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "resetBuiltin": {
+    "message": "Reset to built-in"
+  },
+  "addRule": {
+    "message": "Add rule"
+  },
+  "confirmDelete": {
+    "message": "Delete this rule?"
+  },
+  "confirmReset": {
+    "message": "Discard your changes and reset this rule to the built-in definition?"
+  },
+  "importExportHeading": {
+    "message": "Import and export"
+  },
+  "importExportHelp": {
+    "message": "Export saves custom rules, edited built-in rules, the order, and enabled states. Unedited built-in rules are not included. Import replaces all current settings."
+  },
+  "exportButton": {
+    "message": "Export"
+  },
+  "importButton": {
+    "message": "Import"
+  },
+  "confirmImport": {
+    "message": "Replace all current settings with the contents of this file?"
+  },
+  "importDone": {
+    "message": "Imported."
+  },
+  "importFailed": {
+    "message": "Could not import the file."
+  },
+  "formHeadingNew": {
+    "message": "Add rule"
+  },
+  "formHeadingEdit": {
+    "message": "Edit rule"
+  },
+  "fieldName": {
+    "message": "Name"
+  },
+  "fieldMatch": {
+    "message": "URL conditions"
+  },
+  "fieldMatchHelp": {
+    "message": "Conditions are tried from the top. Values captured by the first matching condition are used in the templates."
+  },
+  "conditionType": {
+    "message": "Type"
+  },
+  "typeUrlPattern": {
+    "message": "URLPattern"
+  },
+  "typeRegex": {
+    "message": "Regular expression"
+  },
+  "fieldPattern": {
+    "message": "Pattern"
+  },
+  "patternHelpUrlPattern": {
+    "message": "Example: https://*.atlassian.net/browse/:key. The query and hash are not matched; use query parameters instead."
+  },
+  "patternHelpRegex": {
+    "message": "Matched against the whole URL. Named groups such as (?<key>...) become variables."
+  },
+  "fieldQuery": {
+    "message": "Query parameters"
+  },
+  "queryVariable": {
+    "message": "Variable"
+  },
+  "queryParam": {
+    "message": "Parameter"
+  },
+  "addQuery": {
+    "message": "Add parameter"
+  },
+  "fieldFallback": {
+    "message": "Use the page title when the title element is not found"
+  },
+  "addCondition": {
+    "message": "Add condition"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "fieldSelectors": {
+    "message": "Title selectors"
+  },
+  "selectorsHelp": {
+    "message": "CSS selectors tried from the top. Leave empty to always use the page title."
+  },
+  "addSelector": {
+    "message": "Add selector"
+  },
+  "fieldStrip": {
+    "message": "Patterns to remove from the page title"
+  },
+  "stripHelp": {
+    "message": "Applied in order when the page title is used. Each pattern removes only its first match."
+  },
+  "addStrip": {
+    "message": "Add pattern"
+  },
+  "fieldLabel": {
+    "message": "Label template"
+  },
+  "fieldUrl": {
+    "message": "URL template"
+  },
+  "templateHelp": {
+    "message": "Use {name} for captured values, and {title}, {host}, and {origin}. {title} is available only in the label. Write {{ and }} for literal braces."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "saveFailed": {
+    "message": "Fix the errors below and save again."
+  },
+  "quotaItemTooLarge": {
+    "message": "This rule is too large to save (limit: 8 KB)."
+  },
+  "quotaTotalTooLarge": {
+    "message": "The settings exceed the storage limit (100 KB)."
+  },
+  "issue_invalidValue": {
+    "message": "Invalid value"
+  },
+  "issue_required": {
+    "message": "Required"
+  },
+  "issue_atLeastOne": {
+    "message": "Add at least one item"
+  },
+  "issue_invalidId": {
+    "message": "Invalid rule ID"
+  },
+  "issue_invalidVariableName": {
+    "message": "Invalid variable name"
+  },
+  "issue_invalidUrlPattern": {
+    "message": "Invalid URLPattern"
+  },
+  "issue_invalidRegex": {
+    "message": "Invalid regular expression"
+  },
+  "issue_invalidSelector": {
+    "message": "Invalid CSS selector"
+  },
+  "issue_invalidTemplate": {
+    "message": "Invalid template"
+  },
+  "issue_reservedVariable": {
+    "message": "This variable name is reserved"
+  },
+  "issue_duplicateVariable": {
+    "message": "The same variable is captured twice"
+  },
+  "issue_undefinedVariable": {
+    "message": "Not captured by every condition"
+  },
+  "issue_titleInUrl": {
+    "message": "{title} cannot be used in the URL template"
+  },
+  "issue_noTitleSource": {
+    "message": "A rule without selectors must allow the page title"
+  },
+  "issue_duplicateRuleId": {
+    "message": "Duplicate rule ID"
+  },
+  "issue_invalidJson": {
+    "message": "Not valid JSON"
+  }
+}

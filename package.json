@@ -1,12 +1,36 @@
 {
-  "name": "copy-gh-title-url",
-  "version": "0.1.0",
+  "name": "copy-title-url",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.19.0",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "test": "node --test",
-    "check": "node scripts/check.js",
-    "zip": "pnpm run check && mkdir -p dist && rm -f dist/copy-gh-title-url.zip && zip -r dist/copy-gh-title-url.zip manifest.json _locales src -x '*.DS_Store'"
+    "postinstall": "wxt prepare",
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "test": "vitest run",
+    "check": "wxt prepare && tsc --noEmit",
+    "schema": "node scripts/generate-schema.ts"
+  },
+  "dependencies": {
+    "preact": "10.29.8",
+    "valibot": "1.2.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "2.10.2",
+    "@types/node": "^24.19.2",
+    "@valibot/to-json-schema": "1.5.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11",
+    "wxt": "0.21.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

@@ -1,0 +1,251 @@
+{
+  "menuParent": {
+    "message": "タイトルと URL をコピー"
+  },
+  "menuCopyPlain": {
+    "message": "プレーンテキストでコピー"
+  },
+  "menuCopyMarkdown": {
+    "message": "Markdown リンクでコピー"
+  },
+  "menuOpenOptions": {
+    "message": "設定を開く"
+  },
+  "toastCopied": {
+    "message": "コピーしました"
+  },
+  "toastCopiedWithFallback": {
+    "message": "タイトル要素が見つからないため、ページのタイトルでコピーしました"
+  },
+  "toastTitleNotFound": {
+    "message": "タイトルを取得できませんでした"
+  },
+  "toastCopyFailed": {
+    "message": "クリップボードへのコピーに失敗しました"
+  },
+  "toastFailed": {
+    "message": "コピーできませんでした。詳細は拡張機能の Service Worker のコンソールを確認してください"
+  },
+  "optionsTitle": {
+    "message": "Copy Title and URL の設定"
+  },
+  "optionsDescription": {
+    "message": "ルールは上から順に評価し、ページの URL に最初に一致したルールでタイトルと URL を整形します。どのルールにも一致しないページでは、ページのタイトルと URL をそのままコピーします。"
+  },
+  "rulesHeading": {
+    "message": "ルール"
+  },
+  "rulesOrderHelp": {
+    "message": "1 つのページに複数のルールが一致したときは一覧で上にあるルールを使うので、優先したいルールはつまみをドラッグして上へ動かしてください。"
+  },
+  "columnName": {
+    "message": "名前"
+  },
+  "columnKind": {
+    "message": "種別"
+  },
+  "columnEnabled": {
+    "message": "有効"
+  },
+  "columnActions": {
+    "message": "操作"
+  },
+  "kindBuiltin": {
+    "message": "組み込み"
+  },
+  "kindEdited": {
+    "message": "組み込み（編集済み）"
+  },
+  "kindUser": {
+    "message": "ユーザー定義"
+  },
+  "invalidRule": {
+    "message": "エラーあり"
+  },
+  "dragHandle": {
+    "message": "ドラッグで並べ替えます。このつまみにフォーカスして、上下の矢印キーでも動かせます"
+  },
+  "edit": {
+    "message": "編集"
+  },
+  "delete": {
+    "message": "削除"
+  },
+  "resetBuiltin": {
+    "message": "組み込みに戻す"
+  },
+  "addRule": {
+    "message": "ルールを追加"
+  },
+  "confirmDelete": {
+    "message": "このルールを削除しますか？"
+  },
+  "confirmReset": {
+    "message": "編集内容を破棄して、組み込みの定義に戻しますか？"
+  },
+  "importExportHeading": {
+    "message": "インポートとエクスポート"
+  },
+  "importExportHelp": {
+    "message": "エクスポートでは、ユーザー定義のルール、編集した組み込みルール、並び順、有効・無効を書き出します。未編集の組み込みルールは含みません。インポートすると、現在の設定はすべて置き換わります。"
+  },
+  "exportButton": {
+    "message": "エクスポート"
+  },
+  "importButton": {
+    "message": "インポート"
+  },
+  "confirmImport": {
+    "message": "現在の設定を、このファイルの内容ですべて置き換えますか？"
+  },
+  "importDone": {
+    "message": "インポートしました"
+  },
+  "importFailed": {
+    "message": "ファイルを読み込めませんでした"
+  },
+  "formHeadingNew": {
+    "message": "ルールを追加"
+  },
+  "formHeadingEdit": {
+    "message": "ルールを編集"
+  },
+  "fieldName": {
+    "message": "名前"
+  },
+  "fieldMatch": {
+    "message": "URL の条件"
+  },
+  "fieldMatchHelp": {
+    "message": "上から順に試し、最初に一致した条件で取り出した値をテンプレートで使います。"
+  },
+  "conditionType": {
+    "message": "種類"
+  },
+  "typeUrlPattern": {
+    "message": "URLPattern"
+  },
+  "typeRegex": {
+    "message": "正規表現"
+  },
+  "fieldPattern": {
+    "message": "パターン"
+  },
+  "patternHelpUrlPattern": {
+    "message": "例: https://*.atlassian.net/browse/:key。クエリとハッシュは照合しないので、クエリパラメータの欄で指定します。"
+  },
+  "patternHelpRegex": {
+    "message": "URL 全体と照合します。(?<key>...) のような名前付きグループが変数になります。"
+  },
+  "fieldQuery": {
+    "message": "クエリパラメータ"
+  },
+  "queryVariable": {
+    "message": "変数名"
+  },
+  "queryParam": {
+    "message": "パラメータ名"
+  },
+  "addQuery": {
+    "message": "パラメータを追加"
+  },
+  "fieldFallback": {
+    "message": "タイトル要素が見つからないとき、ページのタイトルで代用する"
+  },
+  "addCondition": {
+    "message": "条件を追加"
+  },
+  "remove": {
+    "message": "削除"
+  },
+  "fieldSelectors": {
+    "message": "タイトル要素のセレクタ"
+  },
+  "selectorsHelp": {
+    "message": "上から順に試す CSS セレクタです。空にすると、常にページのタイトルを使います。"
+  },
+  "addSelector": {
+    "message": "セレクタを追加"
+  },
+  "fieldStrip": {
+    "message": "ページのタイトルから削る正規表現"
+  },
+  "stripHelp": {
+    "message": "ページのタイトルを使うときに、上から順に適用します。各正規表現は最初の一致だけを削ります。"
+  },
+  "addStrip": {
+    "message": "正規表現を追加"
+  },
+  "fieldLabel": {
+    "message": "表示名のテンプレート"
+  },
+  "fieldUrl": {
+    "message": "URL のテンプレート"
+  },
+  "templateHelp": {
+    "message": "{name} で取り出した値と、{title}、{host}、{origin} を使えます。{title} は表示名でだけ使えます。波括弧そのものは {{ と }} で書きます。"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "cancel": {
+    "message": "キャンセル"
+  },
+  "saveFailed": {
+    "message": "次のエラーを直してから保存してください"
+  },
+  "quotaItemTooLarge": {
+    "message": "ルールが大きすぎて保存できません（上限 8KB）"
+  },
+  "quotaTotalTooLarge": {
+    "message": "設定の合計が保存できる上限（100KB）を超えます"
+  },
+  "issue_invalidValue": {
+    "message": "値が正しくありません"
+  },
+  "issue_required": {
+    "message": "入力してください"
+  },
+  "issue_atLeastOne": {
+    "message": "1 件以上追加してください"
+  },
+  "issue_invalidId": {
+    "message": "ルール ID の形式が正しくありません"
+  },
+  "issue_invalidVariableName": {
+    "message": "変数名の形式が正しくありません"
+  },
+  "issue_invalidUrlPattern": {
+    "message": "URLPattern として解釈できません"
+  },
+  "issue_invalidRegex": {
+    "message": "正規表現として解釈できません"
+  },
+  "issue_invalidSelector": {
+    "message": "CSS セレクタとして解釈できません"
+  },
+  "issue_invalidTemplate": {
+    "message": "テンプレートの書式が正しくありません"
+  },
+  "issue_reservedVariable": {
+    "message": "予約済みの変数名です"
+  },
+  "issue_duplicateVariable": {
+    "message": "同じ変数を 2 か所で取り出しています"
+  },
+  "issue_undefinedVariable": {
+    "message": "すべての条件で取り出される変数ではありません"
+  },
+  "issue_titleInUrl": {
+    "message": "{title} は URL のテンプレートでは使えません"
+  },
+  "issue_noTitleSource": {
+    "message": "セレクタが空のルールでは、ページのタイトルでの代用を止められません"
+  },
+  "issue_duplicateRuleId": {
+    "message": "ルール ID が重複しています"
+  },
+  "issue_invalidJson": {
+    "message": "JSON として解釈できません"
+  }
+}

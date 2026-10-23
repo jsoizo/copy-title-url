@@ -1,0 +1,149 @@
+{
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "order": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "disabled": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "match": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "urlpattern"
+                    },
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "query": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_$][\\w$]*$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "documentTitleFallback": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "pattern"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "regex"
+                    },
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "documentTitleFallback": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "pattern"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "minItems": 1
+          },
+          "title": {
+            "type": "object",
+            "properties": {
+              "selectors": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "documentTitleStrip": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "selectors"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "match",
+          "title",
+          "label",
+          "url"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "version",
+    "order",
+    "disabled",
+    "rules"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Copy Title and URL rules"
+}
