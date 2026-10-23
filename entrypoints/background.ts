@@ -1,7 +1,15 @@
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import type { CopyFormat } from "../lib/format";
-import { COPIER_REQUEST_KEY, type CopierRequest, type CopierResponse } from "../lib/messages";
+import {
+  COPIER_REQUEST_KEY,
+  type CopierRequest,
+  type CopierResponse,
+  type NotifyResult,
+  type PopupRequest,
+  type PreparedCopy,
+  type Toast,
+} from "../lib/messages";
 import { planCopy } from "../lib/plan";
 import { matchRules } from "../lib/rules/match";
 import { activeRules, readStored, resolveEntries } from "../lib/rules/store";
@@ -34,6 +42,12 @@ export default defineBackground(() => {
     const pageUrl = info.pageUrl;
     if (!format || tabId === undefined || !pageUrl) return;
     serialize(() => copyPage(tabId, pageUrl, format));
+  });
+
+  browser.runtime.onMessage.addListener((message: PopupRequest, sender, sendResponse) => {
+    // 拡張自身のページ（ポップアップ）からの依頼だけを受け付ける
+    if (sender.id !== browser.runtime.id || !sender.url?.startsWith(browser.runtime.getURL("/"))) return false;
+    return handlePopupMessage(message, sendResponse);
   });
 });
 
@@ -68,30 +82,65 @@ async function runCopier<T extends CopierRequest>(tabId: number, request: T): Pr
   return injection?.result as CopierResponse<T["type"]>;
 }
 
-async function copyPage(tabId: number, pageUrl: string, format: CopyFormat) {
-  const notifyError = (message: string) =>
-    runCopier(tabId, { type: "notify", toast: { kind: "error", message } });
+async function prepareCopy(tabId: number, pageUrl: string, format: CopyFormat): Promise<PreparedCopy> {
+  const match = matchRules(activeRules(resolveEntries(await readStored())), pageUrl);
+  const extracted = await runCopier(tabId, { type: "extractTitle", selectors: match?.rule.title.selectors ?? [] });
+  const plan = planCopy(match, extracted, pageUrl, format);
+  if (plan.status === "titleNotFound") {
+    return { status: "titleNotFound", toast: errorToast(browser.i18n.getMessage("toastTitleNotFound")) };
+  }
+  return {
+    status: "ready",
+    text: plan.text,
+    toast:
+      plan.status === "fallback"
+        ? { kind: "warning", message: browser.i18n.getMessage("toastCopiedWithFallback") }
+        : { kind: "success", message: browser.i18n.getMessage("toastCopied") },
+    failureMessage: browser.i18n.getMessage("toastCopyFailed"),
+  };
+}
 
+const errorToast = (message: string): Toast => ({ kind: "error", message });
+
+async function copyPage(tabId: number, pageUrl: string, format: CopyFormat) {
   try {
-    const match = matchRules(activeRules(resolveEntries(await readStored())), pageUrl);
-    const extracted = await runCopier(tabId, { type: "extractTitle", selectors: match?.rule.title.selectors ?? [] });
-    const plan = planCopy(match, extracted, pageUrl, format);
-    if (plan.status === "titleNotFound") {
-      await notifyError(browser.i18n.getMessage("toastTitleNotFound"));
-      return;
+    const prepared = await prepareCopy(tabId, pageUrl, format);
+    if (prepared.status === "ready") {
+      const { text, toast, failureMessage } = prepared;
+      await runCopier(tabId, { type: "copy", text, toast, failureMessage });
+    } else if (prepared.status === "titleNotFound") {
+      await runCopier(tabId, { type: "notify", toast: prepared.toast });
     }
-    await runCopier(tabId, {
-      type: "copy",
-      text: plan.text,
-      toast:
-        plan.status === "fallback"
-          ? { kind: "warning", message: browser.i18n.getMessage("toastCopiedWithFallback") }
-          : { kind: "success", message: browser.i18n.getMessage("toastCopied") },
-      failureMessage: browser.i18n.getMessage("toastCopyFailed"),
-    });
   } catch (error) {
     console.error(error);
     // chrome:// などで注入自体が拒否された場合は、ここでも失敗するのでログだけが残る
-    await notifyError(browser.i18n.getMessage("toastFailed"));
+    await runCopier(tabId, { type: "notify", toast: errorToast(browser.i18n.getMessage("toastFailed")) });
   }
+}
+
+function handlePopupMessage(message: PopupRequest, sendResponse: (response: PreparedCopy | NotifyResult) => void): boolean {
+  if (message.type === "popup:prepare") {
+    serialize(async () => {
+      try {
+        sendResponse(await prepareCopy(message.tabId, message.pageUrl, message.format));
+      } catch (error) {
+        console.error(error);
+        sendResponse({ status: "failed" });
+      }
+    });
+    return true;
+  }
+  if (message.type === "popup:notify") {
+    serialize(async () => {
+      let shown = false;
+      try {
+        await runCopier(message.tabId, { type: "notify", toast: message.toast });
+        shown = true;
+      } finally {
+        sendResponse({ shown });
+      }
+    });
+    return true;
+  }
+  return false;
 }
