@@ -1,6 +1,6 @@
 {
   "name": "copy-title-url",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Copy the title and URL of the current page, formatted per site with configurable rules.",
   "license": "MIT",
   "author": "jsoizo",

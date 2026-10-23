@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-10-23
+## [0.1.0] - 2026-10-23
 
 First public release.
 
@@ -17,8 +17,10 @@ First public release.
 - Built-in rules for GitHub issues, pull requests, and discussions, and for Jira issues on Atlassian Cloud. Built-in rules can be edited, disabled, and reset.
 - Pages that match no rule are copied with the page title and URL as they are.
 - An options page to add, edit, reorder, enable, and disable rules, and to import and export them as JSON.
+- Rules are checked when you save or import them: names must be unique and up to 100 characters, values that contain only spaces count as empty, and the URL template must produce an absolute `http` or `https` URL. Leading and trailing spaces are removed from names, URLPattern patterns, query parameters, and selectors.
+- Validation errors are shown under each field in your language, and imports name the rule and field that failed.
 - English and Japanese UI.
 - The extension requests only `contextMenus`, `activeTab`, `scripting`, and `storage`, without host permissions.
 
-[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.2.0
+[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.0
