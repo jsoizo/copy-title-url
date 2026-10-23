@@ -28,8 +28,11 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
   }, [issues, error]);
 
   const update = (patch: Partial<RuleDraft>) => setDraft((current) => ({ ...current, ...patch }));
-  const updateCondition = (index: number, patch: Partial<ConditionDraft>) =>
-    update({ match: draft.match.map((condition, i) => (i === index ? { ...condition, ...patch } : condition)) });
+  const updateCondition = (index: number, patch: (condition: ConditionDraft) => Partial<ConditionDraft>) =>
+    setDraft((current) => ({
+      ...current,
+      match: replaceAt(current.match, index, (condition) => ({ ...condition, ...patch(condition) })),
+    }));
 
   const submit = async (event: Event) => {
     event.preventDefault();
@@ -77,9 +80,6 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
         <input value={draft.name} onInput={(e) => update({ name: e.currentTarget.value })} {...invalid("name")} />
         {fieldIssues("name")}
       </label>
-      <p class="rule-id">
-        ID: <code>{draft.id}</code>
-      </p>
 
       <fieldset>
         <legend>{t("fieldMatch")}</legend>
@@ -92,7 +92,10 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 <span class="field-label">{t("conditionType")}</span>
                 <select
                   value={condition.type}
-                  onChange={(e) => updateCondition(index, { type: e.currentTarget.value as ConditionDraft["type"] })}
+                  onChange={(e) => {
+                    const type = e.currentTarget.value as ConditionDraft["type"];
+                    updateCondition(index, () => ({ type }));
+                  }}
                 >
                   <option value="urlpattern">{t("typeUrlPattern")}</option>
                   <option value="regex">{t("typeRegex")}</option>
@@ -103,7 +106,10 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 <input
                   class="mono"
                   value={condition.pattern}
-                  onInput={(e) => updateCondition(index, { pattern: e.currentTarget.value })}
+                  onInput={(e) => {
+                    const pattern = e.currentTarget.value;
+                    updateCondition(index, () => ({ pattern }));
+                  }}
                   {...invalid(`match.${index}.pattern`, `match.${index}`)}
                 />
               </label>
@@ -111,7 +117,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 type="button"
                 class="secondary"
                 disabled={draft.match.length === 1}
-                onClick={() => update({ match: draft.match.filter((_, i) => i !== index) })}
+                onClick={() => setDraft((current) => ({ ...current, match: removeAt(current.match, index) }))}
               >
                 {t("remove")}
               </button>
@@ -131,13 +137,10 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                       aria-label={t("queryVariable")}
                       value={query.variable}
                       {...invalid(`match.${index}.query`)}
-                      onInput={(e) =>
-                        updateCondition(index, {
-                          query: condition.query.map((q, i) =>
-                            i === queryIndex ? { ...q, variable: e.currentTarget.value } : q,
-                          ),
-                        })
-                      }
+                      onInput={(e) => {
+                        const variable = e.currentTarget.value;
+                        updateCondition(index, (c) => ({ query: replaceAt(c.query, queryIndex, (q) => ({ ...q, variable })) }));
+                      }}
                     />
                     <span>=</span>
                     <input
@@ -146,16 +149,15 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                       aria-label={t("queryParam")}
                       value={query.param}
                       {...invalid(`match.${index}.query`)}
-                      onInput={(e) =>
-                        updateCondition(index, {
-                          query: condition.query.map((q, i) => (i === queryIndex ? { ...q, param: e.currentTarget.value } : q)),
-                        })
-                      }
+                      onInput={(e) => {
+                        const param = e.currentTarget.value;
+                        updateCondition(index, (c) => ({ query: replaceAt(c.query, queryIndex, (q) => ({ ...q, param })) }));
+                      }}
                     />
                     <button
                       type="button"
                       class="secondary"
-                      onClick={() => updateCondition(index, { query: condition.query.filter((_, i) => i !== queryIndex) })}
+                      onClick={() => updateCondition(index, (c) => ({ query: removeAt(c.query, queryIndex) }))}
                     >
                       {t("remove")}
                     </button>
@@ -164,7 +166,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 <button
                   type="button"
                   class="secondary"
-                  onClick={() => updateCondition(index, { query: [...condition.query, { variable: "", param: "" }] })}
+                  onClick={() => updateCondition(index, (c) => ({ query: [...c.query, { variable: "", param: "" }] }))}
                 >
                   {t("addQuery")}
                 </button>
@@ -177,14 +179,21 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 type="checkbox"
                 checked={condition.documentTitleFallback}
                 {...invalid(`match.${index}.documentTitleFallback`)}
-                onChange={(e) => updateCondition(index, { documentTitleFallback: e.currentTarget.checked })}
+                onChange={(e) => {
+                  const documentTitleFallback = e.currentTarget.checked;
+                  updateCondition(index, () => ({ documentTitleFallback }));
+                }}
               />
               {t("fieldFallback")}
             </label>
             {fieldIssues(`match.${index}.documentTitleFallback`)}
           </div>
         ))}
-        <button type="button" class="secondary" onClick={() => update({ match: [...draft.match, emptyCondition()] })}>
+        <button
+          type="button"
+          class="secondary"
+          onClick={() => setDraft((current) => ({ ...current, match: [...current.match, emptyCondition()] }))}
+        >
           {t("addCondition")}
         </button>
       </fieldset>
@@ -257,10 +266,13 @@ function StringList({ legend, help, addLabel, values, path, issuesFor, onChange 
                 class="mono grow"
                 aria-label={legend}
                 value={value}
-                onInput={(e) => onChange(values.map((v, i) => (i === index ? e.currentTarget.value : v)))}
+                onInput={(e) => {
+                  const next = e.currentTarget.value;
+                  onChange(replaceAt(values, index, () => next));
+                }}
                 {...(itemIssues.length > 0 ? { "aria-invalid": true, "aria-describedby": issuesId(key) } : {})}
               />
-              <button type="button" class="secondary" onClick={() => onChange(values.filter((_, i) => i !== index))}>
+              <button type="button" class="secondary" onClick={() => onChange(removeAt(values, index))}>
                 {t("remove")}
               </button>
             </div>
@@ -310,6 +322,10 @@ function IssueDetail({ detail }: { detail: string }) {
 }
 
 const issuesId = (key: string) => `issues-${key}`;
+
+const replaceAt = <T,>(items: readonly T[], index: number, replace: (item: T) => T): T[] =>
+  items.map((item, i) => (i === index ? replace(item) : item));
+const removeAt = <T,>(items: readonly T[], index: number): T[] => items.filter((_, i) => i !== index);
 
 // フォームに表示場所がある欄のキー。これ以外のエラーは上部の要約に出す
 function fieldKeys(draft: RuleDraft): Set<string> {

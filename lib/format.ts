@@ -1,16 +1,24 @@
+import { VARIABLE_NAME } from "./rules/variable";
+
 export type CopyFormat = "plain" | "markdown";
+
+const ASCII_SPACES = /[ \t\n\r\f]+/g;
+const NON_ASCII_SPACE = /[^ \t\n\r\f]/;
 
 export function normalizeTitle(rawTitle: unknown): string {
   if (typeof rawTitle !== "string") return "";
-  return rawTitle.replace(/[ \t\n\r\f]+/g, " ").trim();
+  return rawTitle.replace(ASCII_SPACES, " ").trim();
 }
+
+// 全角スペースと NBSP はタイトルの一部として残すため、ASCII の空白だけを空とみなす
+export const isBlank = (text: string): boolean => !NON_ASCII_SPACE.test(text);
 
 // タイトル自体が除去対象と同じ形で始まることがあるため、g フラグを付けず最初の一致だけを削る
 export function stripTitle(title: string, patterns: readonly string[]): string {
   return patterns.reduce((current, pattern) => current.replace(new RegExp(pattern, "u"), ""), title);
 }
 
-export type TemplatePart = { text: string } | { variable: string };
+type TemplatePart = { text: string } | { variable: string };
 
 export class TemplateError extends Error {
   // position は 0 始まりの文字位置
@@ -22,7 +30,7 @@ export class TemplateError extends Error {
   }
 }
 
-export function parseTemplate(template: string): TemplatePart[] {
+function parseTemplate(template: string): TemplatePart[] {
   const parts: TemplatePart[] = [];
   let text = "";
   for (let i = 0; i < template.length; i++) {
@@ -34,7 +42,7 @@ export function parseTemplate(template: string): TemplatePart[] {
     } else if (char === "{") {
       const end = template.indexOf("}", i);
       const name = end === -1 ? "" : template.slice(i + 1, end);
-      if (!/^[A-Za-z_$][\w$]*$/.test(name)) throw new TemplateError("invalidPlaceholder", i);
+      if (!VARIABLE_NAME.test(name)) throw new TemplateError("invalidPlaceholder", i);
       if (text) parts.push({ text });
       text = "";
       parts.push({ variable: name });

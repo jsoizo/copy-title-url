@@ -14,7 +14,7 @@ import {
   setOrder,
 } from "../../lib/rules/store";
 import { type Issue, validateExport, validateRule } from "../../lib/rules/validate";
-import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft, toDraft } from "./draft";
+import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft } from "./draft";
 import { type MessageKey, t } from "../../lib/i18n";
 import { isValidSelector } from "./selector";
 import { IssueItem, RuleForm } from "./RuleForm";
@@ -49,6 +49,8 @@ export function App() {
     focusAfterMove.current = null;
   }, [entries]);
 
+  const showError = (error: unknown) => setNotice({ kind: "error", message: quotaMessage(error) ?? String(error) });
+
   const reload = async () => {
     const stored = await readStored();
     // 保存前の並びを、保存済みの古い並びで上書きしないため
@@ -57,9 +59,11 @@ export function App() {
   };
 
   useEffect(() => {
-    reload();
+    reload().catch(showError);
     // 別のタブで設定を変えたときにも一覧を最新にするため
-    const listener = (_changes: unknown, area: string) => area === "sync" && reload();
+    const listener = (_changes: unknown, area: string) => {
+      if (area === "sync") reload().catch(showError);
+    };
     browser.storage.onChanged.addListener(listener);
     window.addEventListener("pagehide", flushOrder);
     return () => {
@@ -73,9 +77,9 @@ export function App() {
       await action();
       setNotice(null);
     } catch (error) {
-      setNotice({ kind: "error", message: quotaMessage(error) ?? String(error) });
+      showError(error);
     }
-    await reload();
+    await reload().catch(showError);
   };
 
   function flushOrder() {
@@ -128,12 +132,18 @@ export function App() {
       return quotaMessage(error) ?? String(error);
     }
     setEditing(null);
-    await reload();
+    await reload().catch(showError);
     return null;
   };
 
   const exportRules = async () => {
-    const data = buildExport(await readStored());
+    let data: ReturnType<typeof buildExport>;
+    try {
+      data = buildExport(await readStored());
+    } catch (error) {
+      showError(error);
+      return;
+    }
     const url = URL.createObjectURL(new Blob([`${JSON.stringify(data, null, 2)}\n`], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
@@ -264,7 +274,7 @@ export function App() {
                     <button
                       type="button"
                       class="secondary"
-                      onClick={() => setEditing({ draft: editableDraft(entry), isNew: false })}
+                      onClick={() => setEditing({ draft: looseDraft(entry.raw, entry.id), isNew: false })}
                     >
                       {t("edit")}
                     </button>
@@ -324,10 +334,6 @@ export function App() {
       </section>
     </main>
   );
-}
-
-function editableDraft(entry: RuleEntry): RuleDraft {
-  return entry.rule ? toDraft(entry.rule) : looseDraft(entry.raw, entry.id);
 }
 
 // 検証を通らなかったファイルからも、エラーの場所を示すためにルールの名前だけを拾う

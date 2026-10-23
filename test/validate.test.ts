@@ -95,6 +95,16 @@ describe("validateRule", () => {
     expect(issuesOf(rule)).toEqual([]);
   });
 
+  test("正規表現の文字クラスの中の (?<title> は変数として扱わない", () => {
+    const rule = { ...base, match: [{ type: "regex", pattern: String.raw`^https://example\.com/[(?<title>]/(?<id>\d+)` }] };
+    expect(issuesOf(rule)).toEqual([]);
+  });
+
+  test("| の左右で同じ名前のグループを取り出すと弾く", () => {
+    const rule = { ...base, match: [{ type: "regex", pattern: String.raw`^https://example\.com/(?:a/(?<id>\d+)|b/(?<id>\d+))` }] };
+    expect(issuesOf(rule)).toEqual([{ path: "match.0", code: "duplicateVariable" }]);
+  });
+
   test("URLPattern の正規表現グループ内の : は変数として扱わない", () => {
     const rule = { ...base, match: [{ type: "urlpattern", pattern: "https://example.com/:id((?:\\d+))" }] };
     expect(issuesOf(rule)).toEqual([]);

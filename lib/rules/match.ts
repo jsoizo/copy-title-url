@@ -1,5 +1,6 @@
 import { templateVariables } from "../format";
 import type { MatchCondition, Rule } from "./schema";
+import { VARIABLE_NAME, VARIABLE_NAME_PREFIX } from "./variable";
 
 export type MatchResult = {
   rule: Rule;
@@ -39,7 +40,7 @@ function requiredVariables(rule: Rule): string[] {
   }
 }
 
-export function matchCondition(condition: MatchCondition, url: URL): Record<string, string> | null {
+function matchCondition(condition: MatchCondition, url: URL): Record<string, string> | null {
   try {
     return condition.type === "urlpattern" ? matchUrlPattern(condition, url) : matchRegex(condition.pattern, url);
   } catch {
@@ -55,7 +56,8 @@ function matchUrlPattern(condition: Extract<MatchCondition, { type: "urlpattern"
   const captured: Record<string, string> = {};
   for (const component of URL_COMPONENTS) {
     for (const [name, value] of Object.entries(result[component].groups)) {
-      if (VARIABLE_NAME_START.test(name) && value !== undefined) captured[name] = value;
+      // 名前の無いワイルドカードは "0" などの数字のグループ名になるため除く
+      if (VARIABLE_NAME.test(name) && value !== undefined) captured[name] = value;
     }
   }
   for (const [name, param] of Object.entries(condition.query ?? {})) {
@@ -75,9 +77,6 @@ function matchRegex(pattern: string, url: URL): Record<string, string> | null {
   >;
 }
 
-// 名前の無いワイルドカードは "0" などの数字のグループ名になるため除く
-const VARIABLE_NAME_START = /^[A-Za-z_$]/;
-
 export function conditionVariables(condition: MatchCondition): string[] {
   const names =
     condition.type === "urlpattern" ? urlPatternGroupNames(condition.pattern) : regexGroupNames(condition.pattern);
@@ -96,7 +95,7 @@ function urlPatternGroupNames(pattern: string): string[] {
     } else if (char === ")") {
       depth--;
     } else if (char === ":" && depth === 0) {
-      const name = /^[A-Za-z_$][\w$]*/.exec(pattern.slice(i + 1))?.[0];
+      const name = VARIABLE_NAME_PREFIX.exec(pattern.slice(i + 1))?.[0];
       if (name) {
         names.push(name);
         i += name.length;
@@ -107,14 +106,13 @@ function urlPatternGroupNames(pattern: string): string[] {
 }
 
 function regexGroupNames(pattern: string): string[] {
-  const names: string[] = [];
-  for (let i = 0; i < pattern.length; i++) {
-    if (pattern[i] === "\\") {
-      i++;
-      continue;
-    }
-    const name = /^\(\?<([A-Za-z_$][\w$]*)>/.exec(pattern.slice(i))?.[1];
-    if (name) names.push(name);
+  let names: string[];
+  try {
+    // 空文字列に必ず一致させ、すべての名前付きグループを groups のキーとして得る
+    names = Object.keys(new RegExp(`(?:${pattern})|`, "u").exec("")?.groups ?? {});
+  } catch {
+    return [];
   }
-  return names;
+  // | の左右に書いた同じ名前のグループは groups では 1 つにまとまるため、書いた回数だけ数えて重複を検出できるようにする
+  return names.flatMap((name) => Array<string>(Math.max(1, pattern.split(`(?<${name}>`).length - 1)).fill(name));
 }

@@ -41,7 +41,7 @@ export type Issue = {
 
 export type Validated<T> = { ok: true; value: T } | { ok: false; issues: Issue[] };
 
-export type ValidateOptions = {
+type ValidateOptions = {
   // service worker には DOM が無いため、セレクタはオプション画面でだけ検査する
   isValidSelector?: (selector: string) => boolean;
 };

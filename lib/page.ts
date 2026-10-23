@@ -1,4 +1,5 @@
 import { browser } from "wxt/browser";
+import { isBlank } from "./format";
 import type { ExtractedTitle, Toast } from "./messages";
 
 const TOAST_HOST_ID = "copy-title-url-toast";
@@ -12,8 +13,7 @@ export function extractTitle(selectors: readonly string[]): ExtractedTitle {
     } catch {
       continue;
     }
-    // normalizeTitle と同じく、ASCII の空白だけの要素は空とみなす
-    if (text && /[^ \t\n\r\f]/.test(text)) {
+    if (text && !isBlank(text)) {
       element = text;
       break;
     }

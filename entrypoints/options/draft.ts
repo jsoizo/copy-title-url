@@ -1,7 +1,7 @@
 import type { MatchCondition, Rule } from "../../lib/rules/schema";
 import type { Issue } from "../../lib/rules/validate";
 
-export type QueryDraft = { variable: string; param: string };
+type QueryDraft = { variable: string; param: string };
 
 export type ConditionDraft = {
   type: MatchCondition["type"];
@@ -29,26 +29,6 @@ export const emptyCondition = (): ConditionDraft => ({
 
 export function newDraft(id: string): RuleDraft {
   return { id, name: "", match: [emptyCondition()], selectors: [""], documentTitleStrip: [], label: "{title}", url: "" };
-}
-
-export function toDraft(rule: Rule): RuleDraft {
-  return {
-    id: rule.id,
-    name: rule.name,
-    match: rule.match.map((condition) => ({
-      type: condition.type,
-      pattern: condition.pattern,
-      query:
-        condition.type === "urlpattern"
-          ? Object.entries(condition.query ?? {}).map(([variable, param]) => ({ variable, param }))
-          : [],
-      documentTitleFallback: condition.documentTitleFallback !== false,
-    })),
-    selectors: [...rule.title.selectors],
-    documentTitleStrip: [...(rule.title.documentTitleStrip ?? [])],
-    label: rule.label,
-    url: rule.url,
-  };
 }
 
 // 検証は呼び出し側で行うため、入力をそのままルールの形に詰め替える

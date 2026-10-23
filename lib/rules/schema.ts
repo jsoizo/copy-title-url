@@ -1,14 +1,14 @@
 import * as v from "valibot";
+import { VARIABLE_NAME } from "./variable.ts";
 
-// JSON Schema の生成スクリプトを Node で直接実行するため、valibot 以外を import しないこと
+// JSON Schema の生成スクリプトを Node で直接実行するため、import には拡張子を付けること
 
 // 第 2 引数は validate.ts が読むエラーコード
 const NonEmptyString = v.pipe(v.string(), v.minLength(1, "required"));
 
-export const VARIABLE_NAME = /^[A-Za-z_$][\w$]*$/;
 const VariableName = v.pipe(v.string(), v.regex(VARIABLE_NAME, "invalidVariableName"));
 
-export const RULE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const RULE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const RuleId = v.pipe(v.string(), v.regex(RULE_ID, "invalidId"));
 
 const UrlPatternCondition = v.strictObject({
@@ -24,7 +24,7 @@ const RegexCondition = v.strictObject({
   documentTitleFallback: v.optional(v.boolean()),
 });
 
-export const MatchConditionSchema = v.variant("type", [UrlPatternCondition, RegexCondition]);
+const MatchConditionSchema = v.variant("type", [UrlPatternCondition, RegexCondition]);
 
 export const RuleSchema = v.strictObject({
   id: RuleId,
@@ -46,9 +46,7 @@ export const SettingsSchema = v.strictObject({
 
 export const ExportSchema = v.strictObject({
   $schema: v.optional(v.string()),
-  version: v.literal(1),
-  order: v.array(RuleId),
-  disabled: v.array(RuleId),
+  ...SettingsSchema.entries,
   rules: v.array(RuleSchema),
 });
 

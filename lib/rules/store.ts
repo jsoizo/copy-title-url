@@ -8,15 +8,15 @@ const SETTINGS_KEY = "settings";
 const RULE_PREFIX = "rule:";
 
 // chrome.storage.sync の QUOTA_BYTES_PER_ITEM と QUOTA_BYTES
-export const QUOTA_BYTES_PER_ITEM = 8192;
-export const QUOTA_BYTES = 102400;
+const QUOTA_BYTES_PER_ITEM = 8192;
+const QUOTA_BYTES = 102400;
 
 export type StoredData = {
   settings: Settings;
   rules: Record<string, unknown>;
 };
 
-export type RuleKind = "builtin" | "edited" | "user";
+type RuleKind = "builtin" | "edited" | "user";
 
 export type RuleEntry = {
   id: string;
@@ -173,7 +173,7 @@ async function write(
   if (removed.length > 0 && !removeFirst) await browser.storage.sync.remove(removed);
 }
 
-export function checkQuota(items: Record<string, unknown>): void {
+function checkQuota(items: Record<string, unknown>): void {
   let total = 0;
   for (const [key, value] of Object.entries(items)) {
     const size = byteLength(key) + byteLength(JSON.stringify(value));
