@@ -203,6 +203,9 @@
   "issue_titleInUrl": {
     "message": "{title} cannot be used in the URL template"
   },
+  "issue_urlNotAbsolute": {
+    "message": "Must produce an absolute URL that starts with http:// or https://"
+  },
   "issue_noTitleSource": {
     "message": "A rule without selectors must allow the page title"
   },
@@ -238,6 +241,14 @@
   },
   "issue_required": {
     "message": "Required"
+  },
+  "issue_tooLong": {
+    "message": "Use $VALUE$ characters or fewer",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_atLeastOne": {
     "message": "Add at least one item"
@@ -299,6 +310,14 @@
   },
   "issue_duplicateRuleId": {
     "message": "The rule ID $VALUE$ is used more than once",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_duplicateName": {
+    "message": "A rule named \"$VALUE$\" already exists",
     "placeholders": {
       "value": {
         "content": "$1"

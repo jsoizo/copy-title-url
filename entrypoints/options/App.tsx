@@ -13,7 +13,7 @@ import {
   setEnabled,
   setOrder,
 } from "../../lib/rules/store";
-import { type Issue, validateExport, validateRule } from "../../lib/rules/validate";
+import { duplicateNameIssues, type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft } from "./draft";
 import { type MessageKey, t } from "../../lib/i18n";
 import { isValidSelector } from "./selector";
@@ -127,6 +127,9 @@ export function App() {
     const result = validateRule(fromDraft(draft), { isValidSelector });
     if (!result.ok) return result.issues;
     try {
+      const others = resolveEntries(await readStored()).flatMap((entry) => (entry.rule ? [entry.rule] : []));
+      const nameIssues = duplicateNameIssues(result.value, others);
+      if (nameIssues.length > 0) return nameIssues;
       await saveRule(result.value);
     } catch (error) {
       return quotaMessage(error) ?? String(error);

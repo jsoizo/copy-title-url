@@ -32,7 +32,8 @@
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 100
           },
           "match": {
             "type": "array",
@@ -77,7 +78,7 @@
                     },
                     "pattern": {
                       "type": "string",
-                      "minLength": 1
+                      "pattern": "\\S"
                     },
                     "documentTitleFallback": {
                       "type": "boolean"
@@ -107,7 +108,7 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               }
             },
@@ -118,11 +119,11 @@
           },
           "label": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           },
           "url": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           }
         },
         "required": [

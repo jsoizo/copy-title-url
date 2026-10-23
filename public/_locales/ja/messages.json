@@ -203,6 +203,9 @@
   "issue_titleInUrl": {
     "message": "{title} は URL のテンプレートでは使えません"
   },
+  "issue_urlNotAbsolute": {
+    "message": "http:// か https:// で始まる URL になるようにしてください"
+  },
   "issue_noTitleSource": {
     "message": "セレクタが空のルールでは、ページのタイトルでの代用を止められません"
   },
@@ -238,6 +241,14 @@
   },
   "issue_required": {
     "message": "入力してください"
+  },
+  "issue_tooLong": {
+    "message": "$VALUE$ 文字以内にしてください",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_atLeastOne": {
     "message": "1 件以上追加してください"
@@ -299,6 +310,14 @@
   },
   "issue_duplicateRuleId": {
     "message": "ルール ID $VALUE$ が重複しています",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_duplicateName": {
+    "message": "同じ名前のルール「$VALUE$」がすでにあります",
     "placeholders": {
       "value": {
         "content": "$1"

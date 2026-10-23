@@ -1,5 +1,6 @@
 import * as v from "valibot";
-import { TemplateError, templateVariables } from "../format";
+import { renderTemplate, TemplateError, templateVariables } from "../format";
+import { BUILTIN_RULES } from "./builtin";
 import { conditionVariables, RESERVED_VARIABLES } from "./match";
 import { ExportSchema, RuleSchema, type ExportData, type Rule } from "./schema";
 
@@ -10,6 +11,7 @@ export const ISSUE_CODES = [
   "invalidConditionType",
   "unsupportedVersion",
   "required",
+  "tooLong",
   "atLeastOne",
   "invalidId",
   "invalidVariableName",
@@ -22,8 +24,10 @@ export const ISSUE_CODES = [
   "duplicateVariable",
   "undefinedVariable",
   "titleInUrl",
+  "urlNotAbsolute",
   "noTitleSource",
   "duplicateRuleId",
+  "duplicateName",
   "idMismatch",
   "invalidJson",
 ] as const;
@@ -64,7 +68,19 @@ export function validateExport(input: unknown, options: ValidateOptions = {}): V
     seen.add(rule.id);
     for (const issue of checkRule(rule, options)) issues.push({ ...issue, path: `rules.${index}.${issue.path}` });
   });
+  // 読み込んだあとも残る未編集の組み込みとも、名前が重ならないようにする
+  const kept = BUILTIN_RULES.filter((builtin) => !seen.has(builtin.id));
+  data.rules.forEach((rule, index) => {
+    const others = [...kept, ...data.rules.slice(0, index)];
+    for (const issue of duplicateNameIssues(rule, others)) issues.push({ ...issue, path: `rules.${index}.${issue.path}` });
+  });
   return issues.length > 0 ? { ok: false, issues } : { ok: true, value: data };
+}
+
+// 一覧で見分けられるよう、名前はほかのルールと重ならないようにする
+export function duplicateNameIssues(rule: Rule, others: readonly Rule[]): Issue[] {
+  const duplicated = others.some((other) => other.id !== rule.id && other.name === rule.name);
+  return duplicated ? [{ path: "name", code: "duplicateName", value: rule.name }] : [];
 }
 
 function checkRule(rule: Rule, { isValidSelector }: ValidateOptions): Issue[] {
@@ -125,9 +141,23 @@ function checkRule(rule: Rule, { isValidSelector }: ValidateOptions): Issue[] {
         issues.push({ path: field, code: "undefinedVariable", value: name });
       }
     }
+    if (field === "url" && !issues.some((issue) => issue.path === "url") && !producesAbsoluteUrl(rule.url, used)) {
+      issues.push({ path: "url", code: "urlNotAbsolute" });
+    }
   }
 
   return issues;
+}
+
+// どの値が入っても形が変わらないよう、変数には仮の値を入れて展開する
+function producesAbsoluteUrl(template: string, variables: readonly string[]): boolean {
+  const sample = Object.fromEntries(variables.map((name) => [name, "x"]));
+  try {
+    const url = new URL(renderTemplate(template, { ...sample, host: "example.com", origin: "https://example.com" }));
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function compileError(type: "urlpattern" | "regex", pattern: string): string | null {
@@ -144,6 +174,7 @@ const isIssueCode = (value: unknown): value is IssueCode => ISSUE_CODES.includes
 
 function toIssue(issue: v.BaseIssue<unknown>): Issue {
   const path = v.getDotPath(issue) ?? "";
+  if (issue.message === "tooLong") return { path, code: "tooLong", value: String(issue.requirement) };
   if (isIssueCode(issue.message)) return { path, code: issue.message };
   if (issue.type === "strict_object") return { path, code: "unknownKey", value: String(issue.input) };
   if (issue.type === "variant") return { path, code: "invalidConditionType", value: String(issue.input) };

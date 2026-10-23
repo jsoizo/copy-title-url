@@ -46,7 +46,7 @@ describe("validateRule", () => {
     ],
     [
       "正規表現として不正",
-      { ...base, match: [{ type: "regex", pattern: "(?<id>" }], label: "{title}", url: "x" },
+      { ...base, match: [{ type: "regex", pattern: "(?<id>" }], label: "{title}", url: "https://example.com/" },
       [{ path: "match.0.pattern", code: "invalidRegex" }],
     ],
     [
@@ -76,6 +76,17 @@ describe("validateRule", () => {
       ],
     ],
     ["URL で title を使う", { ...base, url: "https://example.com/{title}" }, [{ path: "url", code: "titleInUrl" }]],
+    ["名前が空白だけ", { ...base, name: " \u3000 " }, [{ path: "name", code: "required" }]],
+    ["名前が長すぎる", { ...base, name: "a".repeat(101) }, [{ path: "name", code: "tooLong" }]],
+    ["表示名のテンプレートが空白だけ", { ...base, label: "  " }, [{ path: "label", code: "required" }]],
+    [
+      "正規表現のパターンが空白だけ",
+      { ...base, match: [{ type: "regex", pattern: " " }] },
+      [{ path: "match.0.pattern", code: "required" }],
+    ],
+    ["セレクタが空白だけ", { ...base, title: { selectors: [" "] } }, [{ path: "title.selectors.0", code: "required" }]],
+    ["URL がスキームで始まらない", { ...base, url: "example.com/items/{id}" }, [{ path: "url", code: "urlNotAbsolute" }]],
+    ["URL のスキームが http でも https でもない", { ...base, url: "ftp://{host}/{id}" }, [{ path: "url", code: "urlNotAbsolute" }]],
     ["閉じていない波括弧", { ...base, label: "{id" }, [{ path: "label", code: "templateInvalidPlaceholder" }]],
     ["対応しない閉じ波括弧", { ...base, label: "{id}}x}" }, [{ path: "label", code: "templateUnmatchedBrace" }]],
     [
@@ -110,8 +121,35 @@ describe("validateRule", () => {
     expect(issuesOf(rule)).toEqual([]);
   });
 
+  test("名前、URLPattern、クエリ、セレクタは前後の空白を削り、テンプレートと正規表現は削らない", () => {
+    const result = validateRule({
+      ...base,
+      name: " Example ",
+      match: [{ type: "urlpattern", pattern: " https://example.com/items/:id ", query: { " page ": " p " } }],
+      title: { selectors: [" h1 "], documentTitleStrip: [" - Site$"] },
+      label: "{id} {title} ",
+      url: "{origin}/items/{id}",
+    });
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        ...base,
+        name: "Example",
+        match: [{ type: "urlpattern", pattern: "https://example.com/items/:id", query: { page: "p" } }],
+        title: { selectors: ["h1"], documentTitleStrip: [" - Site$"] },
+        label: "{id} {title} ",
+        url: "{origin}/items/{id}",
+      },
+    });
+  });
+
+  test("名前の上限を超えたときは、上限の文字数を文言に差し込む", () => {
+    const result = validateRule({ ...base, name: "a".repeat(101) });
+    expect(result.ok ? [] : result.issues).toEqual([{ path: "name", code: "tooLong", value: "100" }]);
+  });
+
   test("文言に差し込む値と、英語の詳細を分けて返す", () => {
-    const result = validateRule({ ...base, label: "{id} x}", match: [{ type: "regex", pattern: "(?<id>" }], url: "x" });
+    const result = validateRule({ ...base, label: "{id} x}", match: [{ type: "regex", pattern: "(?<id>" }], url: "https://example.com/" });
     expect(result.ok ? [] : result.issues).toEqual([
       { path: "match.0.pattern", code: "invalidRegex", detail: expect.stringContaining("Invalid regular expression") },
       { path: "label", code: "templateUnmatchedBrace", value: "7" },
@@ -138,6 +176,24 @@ describe("validateExport", () => {
     expect(result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
       { path: "rules.1.id", code: "duplicateRuleId" },
       { path: "rules.1.url", code: "titleInUrl" },
+    ]);
+  });
+
+  test("ルールの名前が、ほかのルールや残る組み込みと重なれば弾く", () => {
+    const result = validateExport({
+      version: 1,
+      order: [],
+      disabled: [],
+      rules: [
+        { ...base, name: "GitHub" },
+        { ...base, id: "user-2", name: "Other" },
+        { ...base, id: "user-3", name: "Other" },
+        { ...BUILTIN_RULES.find((rule) => rule.id === "jira")!, name: "Jira" },
+      ],
+    });
+    expect(result.ok ? [] : result.issues).toEqual([
+      { path: "rules.0.name", code: "duplicateName", value: "GitHub" },
+      { path: "rules.2.name", code: "duplicateName", value: "Other" },
     ]);
   });
 
