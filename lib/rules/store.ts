@@ -55,13 +55,17 @@ export function resolveEntries(stored: StoredData, builtins: readonly Rule[] = B
   }
   for (const [id, raw] of Object.entries(stored.rules)) {
     const result = validateRule(raw);
-    const issues = result.ok ? [] : result.issues;
-    if (!result.ok) console.error(`invalid rule in storage: ${id}`, issues);
+    const issues: Issue[] = !result.ok
+      ? result.issues
+      : result.value.id !== id
+        ? [{ path: "id", code: "idMismatch", detail: id }]
+        : [];
+    if (issues.length > 0) console.error(`invalid rule in storage: ${id}`, issues);
     entries.set(id, {
       id,
       kind: builtinIds.has(id) ? "edited" : "user",
       enabled: true,
-      rule: result.ok ? result.value : null,
+      rule: result.ok && issues.length === 0 ? result.value : null,
       raw,
       issues,
     });
@@ -112,13 +116,8 @@ export async function setEnabled(id: string, enabled: boolean): Promise<void> {
   await write(stored, { [SETTINGS_KEY]: { ...stored.settings, disabled } }, []);
 }
 
-// index は、移動するルールを一覧から抜いたあとの位置
-export async function moveRule(id: string, index: number): Promise<void> {
+export async function setOrder(order: string[]): Promise<void> {
   const stored = await readStored();
-  const order = currentOrder(stored);
-  const from = order.indexOf(id);
-  if (from === -1 || index < 0 || index >= order.length || index === from) return;
-  order.splice(index, 0, ...order.splice(from, 1));
   await write(stored, { [SETTINGS_KEY]: { ...stored.settings, order } }, []);
 }
 
@@ -159,15 +158,19 @@ async function write(
   removed: string[],
   replace = false,
 ): Promise<void> {
-  const current: Record<string, unknown> = replace
-    ? {}
-    : { [SETTINGS_KEY]: stored.settings, ...Object.fromEntries(Object.entries(stored.rules).map(([id, rule]) => [ruleKey(id), rule])) };
-  for (const key of removed) delete current[key];
-  const next = { ...current, ...items };
-  checkQuota(next);
+  const existing: Record<string, unknown> = {
+    [SETTINGS_KEY]: stored.settings,
+    ...Object.fromEntries(Object.entries(stored.rules).map(([id, rule]) => [ruleKey(id), rule])),
+  };
+  const kept = replace ? {} : { ...existing };
+  for (const key of removed) delete kept[key];
+  checkQuota({ ...kept, ...items });
 
-  if (removed.length > 0) await browser.storage.sync.remove(removed);
+  // set を先にすると、失敗しても古いルールが残る。新旧の合計が上限を超えるときだけ、先に消して空きを作る
+  const removeFirst = removed.length > 0 && !fitsQuota({ ...existing, ...items });
+  if (removeFirst) await browser.storage.sync.remove(removed);
   await browser.storage.sync.set(items);
+  if (removed.length > 0 && !removeFirst) await browser.storage.sync.remove(removed);
 }
 
 export function checkQuota(items: Record<string, unknown>): void {
@@ -178,6 +181,15 @@ export function checkQuota(items: Record<string, unknown>): void {
     total += size;
   }
   if (total > QUOTA_BYTES) throw new QuotaError("totalTooLarge");
+}
+
+function fitsQuota(items: Record<string, unknown>): boolean {
+  try {
+    checkQuota(items);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const encoder = new TextEncoder();

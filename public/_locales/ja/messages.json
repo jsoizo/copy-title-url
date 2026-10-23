@@ -245,6 +245,9 @@
   "issue_duplicateRuleId": {
     "message": "ルール ID が重複しています"
   },
+  "issue_idMismatch": {
+    "message": "保存先の ID と一致しません"
+  },
   "issue_invalidJson": {
     "message": "JSON として解釈できません"
   }

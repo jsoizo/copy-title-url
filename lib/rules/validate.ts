@@ -19,6 +19,7 @@ export const ISSUE_CODES = [
   "titleInUrl",
   "noTitleSource",
   "duplicateRuleId",
+  "idMismatch",
   "invalidJson",
 ] as const;
 

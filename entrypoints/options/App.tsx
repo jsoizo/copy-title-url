@@ -4,7 +4,6 @@ import {
   buildExport,
   deleteRule,
   generateRuleId,
-  moveRule,
   QuotaError,
   readStored,
   replaceAll,
@@ -12,6 +11,7 @@ import {
   type RuleEntry,
   saveRule,
   setEnabled,
+  setOrder,
 } from "../../lib/rules/store";
 import { type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft, toDraft } from "./draft";
@@ -38,6 +38,9 @@ export function App() {
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   // 行の DOM を入れ替えるとフォーカスが外れるため、矢印キーで動かした行のつまみへ戻す
   const focusAfterMove = useRef<number | null>(null);
+  // storage.sync は書き込み回数に上限があるため、矢印キーの連打などはまとめて保存する
+  const pendingOrder = useRef<string[] | null>(null);
+  const orderTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (focusAfterMove.current === null) return;
@@ -45,14 +48,23 @@ export function App() {
     focusAfterMove.current = null;
   }, [entries]);
 
-  const reload = async () => setEntries(resolveEntries(await readStored()));
+  const reload = async () => {
+    const stored = await readStored();
+    // 保存前の並びを、保存済みの古い並びで上書きしないため
+    if (pendingOrder.current) return;
+    setEntries(resolveEntries(stored));
+  };
 
   useEffect(() => {
     reload();
     // 別のタブで設定を変えたときにも一覧を最新にするため
     const listener = (_changes: unknown, area: string) => area === "sync" && reload();
     browser.storage.onChanged.addListener(listener);
-    return () => browser.storage.onChanged.removeListener(listener);
+    window.addEventListener("pagehide", flushOrder);
+    return () => {
+      browser.storage.onChanged.removeListener(listener);
+      window.removeEventListener("pagehide", flushOrder);
+    };
   }, []);
 
   const run = async (action: () => Promise<void>) => {
@@ -65,6 +77,14 @@ export function App() {
     await reload();
   };
 
+  function flushOrder() {
+    clearTimeout(orderTimer.current);
+    const order = pendingOrder.current;
+    if (!order) return;
+    pendingOrder.current = null;
+    run(() => setOrder(order));
+  }
+
   // 保存の完了を待つと行が一瞬元の位置に戻るため、先に画面の並びだけを入れ替える
   const move = (from: number, to: number) => {
     if (!entries || to < 0 || to >= entries.length || to === from) return;
@@ -73,7 +93,9 @@ export function App() {
     if (!moved) return;
     next.splice(to, 0, moved);
     setEntries(next);
-    run(() => moveRule(moved.id, to));
+    pendingOrder.current = next.map((entry) => entry.id);
+    clearTimeout(orderTimer.current);
+    orderTimer.current = setTimeout(flushOrder, 300);
   };
 
   const endDrag = () => {

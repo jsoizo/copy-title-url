@@ -245,6 +245,9 @@
   "issue_duplicateRuleId": {
     "message": "Duplicate rule ID"
   },
+  "issue_idMismatch": {
+    "message": "Does not match the ID the rule is stored under"
+  },
   "issue_invalidJson": {
     "message": "Not valid JSON"
   }

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { browser } from "wxt/browser";
 import { fakeBrowser } from "wxt/testing/fake-browser";
 import { BUILTIN_RULES } from "../lib/rules/builtin";
@@ -7,13 +7,13 @@ import {
   activeRules,
   buildExport,
   deleteRule,
-  moveRule,
   QuotaError,
   readStored,
   replaceAll,
   resolveEntries,
   saveRule,
   setEnabled,
+  setOrder,
 } from "../lib/rules/store";
 
 const userRule: Rule = {
@@ -31,6 +31,7 @@ const entries = async () => resolveEntries(await readStored());
 const summary = async () => (await entries()).map(({ id, kind, enabled }) => ({ id, kind, enabled }));
 
 beforeEach(() => {
+  vi.restoreAllMocks();
   fakeBrowser.reset();
 });
 
@@ -51,6 +52,13 @@ describe("有効なルール一覧", () => {
     await browser.storage.sync.set({ "rule:user-1": { ...userRule, match: [] } });
     const entry = (await entries()).find((e) => e.id === "user-1");
     expect(entry).toMatchObject({ kind: "user", rule: null, issues: [{ path: "match", code: "atLeastOne" }] });
+    expect(activeRules(await entries())).toEqual(BUILTIN_RULES);
+  });
+
+  test("保存先のキーと中の id が違う保存値は、検証を通らないものとして扱う", async () => {
+    await browser.storage.sync.set({ "rule:user-1": { ...userRule, id: "user-2" } });
+    const entry = (await entries()).find((e) => e.id === "user-1");
+    expect(entry).toMatchObject({ kind: "user", rule: null, issues: [{ path: "id", code: "idMismatch", detail: "user-1" }] });
     expect(activeRules(await entries())).toEqual(BUILTIN_RULES);
   });
 });
@@ -92,15 +100,10 @@ describe("並べ替えと有効・無効", () => {
     expect(activeRules(await entries()).map((rule) => rule.id)).toEqual(["github"]);
   });
 
-  test("指定した位置へ動かし、範囲外の位置では動かさない", async () => {
+  test("渡した並びをそのまま保存する", async () => {
     await saveRule(userRule);
-    await moveRule("user-1", 0);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["user-1", "github", "jira"]);
-    await moveRule("user-1", 2);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "user-1"]);
-    await moveRule("github", 3);
-    await moveRule("github", -1);
-    expect((await entries()).map((entry) => entry.id)).toEqual(["github", "jira", "user-1"]);
+    await setOrder(["user-1", "jira", "github"]);
+    expect((await entries()).map((entry) => entry.id)).toEqual(["user-1", "jira", "github"]);
   });
 });
 
@@ -123,6 +126,32 @@ describe("エクスポートとインポート", () => {
 
     await replaceAll(exported);
     expect(await summary()).toEqual(before);
+  });
+});
+
+describe("書き込みの順", () => {
+  const largeRules = (prefix: string) =>
+    Array.from({ length: 8 }, (_, i) => ({ ...userRule, id: `${prefix}-${i}`, title: { selectors: ["x".repeat(7000)] } }));
+
+  const callOrder = () => {
+    const calls: string[] = [];
+    vi.spyOn(fakeBrowser.storage.sync, "set").mockImplementation(async () => void calls.push("set"));
+    vi.spyOn(fakeBrowser.storage.sync, "remove").mockImplementation(async () => void calls.push("remove"));
+    return calls;
+  };
+
+  test("新旧の合計が上限に収まるインポートは、書き込んでから古いルールを消す", async () => {
+    await saveRule(userRule);
+    const calls = callOrder();
+    await replaceAll({ version: 1, order: [], disabled: [], rules: [{ ...userRule, id: "user-2" }] });
+    expect(calls).toEqual(["set", "remove"]);
+  });
+
+  test("新旧の合計が上限を超えるインポートは、先に古いルールを消して空きを作る", async () => {
+    await replaceAll({ version: 1, order: [], disabled: [], rules: largeRules("old") });
+    const calls = callOrder();
+    await replaceAll({ version: 1, order: [], disabled: [], rules: largeRules("new") });
+    expect(calls).toEqual(["remove", "set"]);
   });
 });
 
