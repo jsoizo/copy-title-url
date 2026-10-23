@@ -200,8 +200,41 @@
   "quotaTotalTooLarge": {
     "message": "設定の合計が保存できる上限（100KB）を超えます"
   },
+  "issue_titleInUrl": {
+    "message": "{title} は URL のテンプレートでは使えません"
+  },
+  "issue_noTitleSource": {
+    "message": "セレクタが空のルールでは、ページのタイトルでの代用を止められません"
+  },
   "issue_invalidValue": {
     "message": "値が正しくありません"
+  },
+  "issue_invalidType": {
+    "message": "値の型が正しくありません"
+  },
+  "issue_unknownKey": {
+    "message": "未知の項目「$VALUE$」があります",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_invalidConditionType": {
+    "message": "条件の種類「$VALUE$」は使えません。urlpattern か regex を指定してください",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_unsupportedVersion": {
+    "message": "対応していない形式のバージョン（$VALUE$）です",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_required": {
     "message": "入力してください"
@@ -210,10 +243,10 @@
     "message": "1 件以上追加してください"
   },
   "issue_invalidId": {
-    "message": "ルール ID の形式が正しくありません"
+    "message": "ルール ID には英小文字、数字、- だけを使えます"
   },
   "issue_invalidVariableName": {
-    "message": "変数名の形式が正しくありません"
+    "message": "変数名は英字、_、$$ のいずれかで始め、英数字、_、$$ だけを使ってください"
   },
   "issue_invalidUrlPattern": {
     "message": "URLPattern として解釈できません"
@@ -224,31 +257,181 @@
   "issue_invalidSelector": {
     "message": "CSS セレクタとして解釈できません"
   },
-  "issue_invalidTemplate": {
-    "message": "テンプレートの書式が正しくありません"
+  "issue_templateInvalidPlaceholder": {
+    "message": "$VALUE$ 文字目の { が閉じていないか、中の変数名の形式が正しくありません。{ そのものを書くときは {{ にしてください",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_templateUnmatchedBrace": {
+    "message": "$VALUE$ 文字目の } に対応する { がありません。} そのものを書くときは }} にしてください",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_reservedVariable": {
-    "message": "予約済みの変数名です"
+    "message": "変数名 $VALUE$ は予約されているため、取り出す変数には使えません",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_duplicateVariable": {
-    "message": "同じ変数を 2 か所で取り出しています"
+    "message": "変数 $VALUE$ を 2 か所で取り出しています",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_undefinedVariable": {
-    "message": "すべての条件で取り出される変数ではありません"
-  },
-  "issue_titleInUrl": {
-    "message": "{title} は URL のテンプレートでは使えません"
-  },
-  "issue_noTitleSource": {
-    "message": "セレクタが空のルールでは、ページのタイトルでの代用を止められません"
+    "message": "変数 $VALUE$ は、すべての条件で取り出される変数ではありません",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_duplicateRuleId": {
-    "message": "ルール ID が重複しています"
+    "message": "ルール ID $VALUE$ が重複しています",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_idMismatch": {
-    "message": "保存先の ID と一致しません"
+    "message": "保存先の ID（$VALUE$）と一致しません",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_invalidJson": {
     "message": "JSON として解釈できません"
+  },
+  "issueDetail": {
+    "message": "詳細"
+  },
+  "issueWithLocation": {
+    "message": "$LOCATION$：$MESSAGE$",
+    "placeholders": {
+      "location": {
+        "content": "$1"
+      },
+      "message": {
+        "content": "$2"
+      }
+    }
+  },
+  "loc_id": {
+    "message": "ルール ID"
+  },
+  "loc_title": {
+    "message": "タイトルの取得"
+  },
+  "loc_condition": {
+    "message": "URL の条件 $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionType": {
+    "message": "URL の条件 $INDEX$ の種類",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionPattern": {
+    "message": "URL の条件 $INDEX$ のパターン",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionQuery": {
+    "message": "URL の条件 $INDEX$ のクエリパラメータ",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionFallback": {
+    "message": "URL の条件 $INDEX$ のページのタイトルでの代用",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_selector": {
+    "message": "タイトル要素のセレクタ $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_strip": {
+    "message": "ページのタイトルから削る正規表現 $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_version": {
+    "message": "形式のバージョン"
+  },
+  "loc_order": {
+    "message": "ルールの並び順"
+  },
+  "loc_disabled": {
+    "message": "無効にしたルール"
+  },
+  "loc_rules": {
+    "message": "ルール"
+  },
+  "loc_rule": {
+    "message": "$INDEX$ 番目のルール「$NAME$」",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      },
+      "name": {
+        "content": "$2"
+      }
+    }
+  },
+  "loc_ruleWithoutName": {
+    "message": "$INDEX$ 番目のルール",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_inRule": {
+    "message": "$RULE$、$FIELD$",
+    "placeholders": {
+      "rule": {
+        "content": "$1"
+      },
+      "field": {
+        "content": "$2"
+      }
+    }
   }
 }

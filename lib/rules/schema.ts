@@ -2,13 +2,14 @@ import * as v from "valibot";
 
 // JSON Schema の生成スクリプトを Node で直接実行するため、valibot 以外を import しないこと
 
-const NonEmptyString = v.pipe(v.string(), v.minLength(1));
+// 第 2 引数は validate.ts が読むエラーコード
+const NonEmptyString = v.pipe(v.string(), v.minLength(1, "required"));
 
 export const VARIABLE_NAME = /^[A-Za-z_$][\w$]*$/;
-const VariableName = v.pipe(v.string(), v.regex(VARIABLE_NAME));
+const VariableName = v.pipe(v.string(), v.regex(VARIABLE_NAME, "invalidVariableName"));
 
 export const RULE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const RuleId = v.pipe(v.string(), v.regex(RULE_ID));
+const RuleId = v.pipe(v.string(), v.regex(RULE_ID, "invalidId"));
 
 const UrlPatternCondition = v.strictObject({
   type: v.literal("urlpattern"),
@@ -28,7 +29,7 @@ export const MatchConditionSchema = v.variant("type", [UrlPatternCondition, Rege
 export const RuleSchema = v.strictObject({
   id: RuleId,
   name: NonEmptyString,
-  match: v.pipe(v.array(MatchConditionSchema), v.minLength(1)),
+  match: v.pipe(v.array(MatchConditionSchema), v.minLength(1, "atLeastOne")),
   title: v.strictObject({
     selectors: v.array(NonEmptyString),
     documentTitleStrip: v.optional(v.array(NonEmptyString)),

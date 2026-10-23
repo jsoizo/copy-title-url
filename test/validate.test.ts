@@ -26,7 +26,19 @@ describe("validateRule", () => {
     ["名前が空", { ...base, name: "" }, [{ path: "name", code: "required" }]],
     ["条件が 0 件", { ...base, match: [] }, [{ path: "match", code: "atLeastOne" }]],
     ["ID の形式", { ...base, id: "User 1" }, [{ path: "id", code: "invalidId" }]],
-    ["未知のフィールド", { ...base, extra: 1 }, [{ path: "extra", code: "invalidValue" }]],
+    ["未知のフィールド", { ...base, extra: 1 }, [{ path: "extra", code: "unknownKey" }]],
+    ["必須のフィールドが無い", { ...base, label: undefined }, [{ path: "label", code: "required" }]],
+    ["型が違う", { ...base, name: 3 }, [{ path: "name", code: "invalidType" }]],
+    [
+      "条件の種類が不正",
+      { ...base, match: [{ type: "glob", pattern: "x" }] },
+      [{ path: "match.0.type", code: "invalidConditionType" }],
+    ],
+    [
+      "クエリの変数名の形式",
+      { ...base, match: [{ ...base.match[0], query: { "a b": "q" } }] },
+      [{ path: "match.0.query.a b", code: "invalidVariableName" }],
+    ],
     [
       "URLPattern として不正",
       { ...base, match: [{ type: "urlpattern", pattern: "https://example.com/(" }] },
@@ -64,7 +76,8 @@ describe("validateRule", () => {
       ],
     ],
     ["URL で title を使う", { ...base, url: "https://example.com/{title}" }, [{ path: "url", code: "titleInUrl" }]],
-    ["閉じていない波括弧", { ...base, label: "{id" }, [{ path: "label", code: "invalidTemplate" }]],
+    ["閉じていない波括弧", { ...base, label: "{id" }, [{ path: "label", code: "templateInvalidPlaceholder" }]],
+    ["対応しない閉じ波括弧", { ...base, label: "{id}}x}" }, [{ path: "label", code: "templateUnmatchedBrace" }]],
     [
       "セレクタが空なのに代用を止める",
       { ...base, match: [{ ...base.match[0], documentTitleFallback: false }], title: { selectors: [] } },
@@ -85,6 +98,14 @@ describe("validateRule", () => {
   test("URLPattern の正規表現グループ内の : は変数として扱わない", () => {
     const rule = { ...base, match: [{ type: "urlpattern", pattern: "https://example.com/:id((?:\\d+))" }] };
     expect(issuesOf(rule)).toEqual([]);
+  });
+
+  test("文言に差し込む値と、英語の詳細を分けて返す", () => {
+    const result = validateRule({ ...base, label: "{id} x}", match: [{ type: "regex", pattern: "(?<id>" }], url: "x" });
+    expect(result.ok ? [] : result.issues).toEqual([
+      { path: "match.0.pattern", code: "invalidRegex", detail: expect.stringContaining("Invalid regular expression") },
+      { path: "label", code: "templateUnmatchedBrace", value: "7" },
+    ]);
   });
 
   test("セレクタは検査関数を渡したときだけ検査する", () => {
@@ -115,6 +136,9 @@ describe("validateExport", () => {
   });
 
   test("version が 1 でなければ弾く", () => {
-    expect(validateExport({ version: 2, order: [], disabled: [], rules: [] }).ok).toBe(false);
+    expect(validateExport({ version: 2, order: [], disabled: [], rules: [] })).toEqual({
+      ok: false,
+      issues: [{ path: "version", code: "unsupportedVersion", value: "2" }],
+    });
   });
 });

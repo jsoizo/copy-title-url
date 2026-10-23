@@ -1,14 +1,8 @@
 import { browser } from "wxt/browser";
-import type { Issue } from "../../lib/rules/validate";
 
 export type MessageKey = Parameters<typeof browser.i18n.getMessage>[0];
 
-export const t = (key: MessageKey): string => browser.i18n.getMessage(key);
-
-export function issueMessage(issue: Issue): string {
-  const message = t(`issue_${issue.code}` as MessageKey);
-  return issue.detail ? `${message}: ${issue.detail}` : message;
-}
+export const t = (key: MessageKey, substitutions?: string[]): string => browser.i18n.getMessage(key, substitutions);
 
 export function isValidSelector(selector: string): boolean {
   try {

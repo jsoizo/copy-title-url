@@ -12,7 +12,15 @@ export function stripTitle(title: string, patterns: readonly string[]): string {
 
 export type TemplatePart = { text: string } | { variable: string };
 
-export class TemplateError extends Error {}
+export class TemplateError extends Error {
+  // position は 0 始まりの文字位置
+  constructor(
+    readonly kind: "invalidPlaceholder" | "unmatchedBrace",
+    readonly position: number,
+  ) {
+    super(`${kind} at ${position}`);
+  }
+}
 
 export function parseTemplate(template: string): TemplatePart[] {
   const parts: TemplatePart[] = [];
@@ -26,13 +34,13 @@ export function parseTemplate(template: string): TemplatePart[] {
     } else if (char === "{") {
       const end = template.indexOf("}", i);
       const name = end === -1 ? "" : template.slice(i + 1, end);
-      if (!/^[A-Za-z_$][\w$]*$/.test(name)) throw new TemplateError(`invalid placeholder at ${i}`);
+      if (!/^[A-Za-z_$][\w$]*$/.test(name)) throw new TemplateError("invalidPlaceholder", i);
       if (text) parts.push({ text });
       text = "";
       parts.push({ variable: name });
       i = end;
     } else if (char === "}") {
-      throw new TemplateError(`unmatched "}" at ${i}`);
+      throw new TemplateError("unmatchedBrace", i);
     } else {
       text += char;
     }
@@ -50,7 +58,7 @@ export function renderTemplate(template: string, variables: Readonly<Record<stri
     .map((part) => {
       if ("text" in part) return part.text;
       const value = variables[part.variable];
-      if (value === undefined) throw new TemplateError(`undefined variable: ${part.variable}`);
+      if (value === undefined) throw new Error(`undefined variable: ${part.variable}`);
       return value;
     })
     .join("");

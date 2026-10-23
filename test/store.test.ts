@@ -58,7 +58,7 @@ describe("有効なルール一覧", () => {
   test("保存先のキーと中の id が違う保存値は、検証を通らないものとして扱う", async () => {
     await browser.storage.sync.set({ "rule:user-1": { ...userRule, id: "user-2" } });
     const entry = (await entries()).find((e) => e.id === "user-1");
-    expect(entry).toMatchObject({ kind: "user", rule: null, issues: [{ path: "id", code: "idMismatch", detail: "user-1" }] });
+    expect(entry).toMatchObject({ kind: "user", rule: null, issues: [{ path: "id", code: "idMismatch", value: "user-1" }] });
     expect(activeRules(await entries())).toEqual(BUILTIN_RULES);
   });
 });

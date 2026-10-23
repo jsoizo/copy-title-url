@@ -1,7 +1,8 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { Issue } from "../../lib/rules/validate";
 import { type ConditionDraft, emptyCondition, type RuleDraft } from "./draft";
-import { issueMessage, t } from "./i18n";
+import { t } from "./i18n";
+import { fieldKey, issueLocation, issueMessage } from "./issues";
 
 type Props = {
   initial: RuleDraft;
@@ -15,6 +16,16 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const form = useRef<HTMLFormElement>(null);
+  // 保存に失敗したら、画面の外にある欄のエラーにも気づけるよう、最初のエラーの欄へ移る
+  const focusFirstError = useRef(false);
+
+  useEffect(() => {
+    if (!focusFirstError.current) return;
+    focusFirstError.current = false;
+    const target = form.current?.querySelector<HTMLElement>('[aria-invalid="true"]') ?? form.current?.querySelector<HTMLElement>(".alert");
+    target?.focus();
+  }, [issues, error]);
 
   const update = (patch: Partial<RuleDraft>) => setDraft((current) => ({ ...current, ...patch }));
   const updateCondition = (index: number, patch: Partial<ConditionDraft>) =>
@@ -33,22 +44,28 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
     }
     setIssues(Array.isArray(result) ? result : []);
     setError(typeof result === "string" ? result : Array.isArray(result) && result.length > 0 ? t("saveFailed") : null);
+    focusFirstError.current = true;
   };
 
-  const fieldIssues = (path: string) => <FieldIssues issues={issues.filter((issue) => issue.path === path)} />;
+  const issuesFor = (key: string) => issues.filter((issue) => fieldKey(issue.path) === key);
+  const fieldIssues = (key: string) => <FieldIssues id={issuesId(key)} issues={issuesFor(key)} />;
+  // 入力欄に、表示しているエラーを結び付ける
+  const invalid = (...keys: string[]) => {
+    const shown = keys.filter((key) => issuesFor(key).length > 0);
+    return shown.length === 0 ? {} : { "aria-invalid": true, "aria-describedby": shown.map(issuesId).join(" ") };
+  };
+  const unshown = issues.filter((issue) => !fieldKeys(draft).has(fieldKey(issue.path)));
 
   return (
-    <form class="rule-form" onSubmit={submit}>
+    <form ref={form} class="rule-form" onSubmit={submit}>
       <h2>{isNew ? t("formHeadingNew") : t("formHeadingEdit")}</h2>
       {error && (
-        <div class="alert" role="alert">
+        <div class="alert" role="alert" tabIndex={-1}>
           <p>{error}</p>
-          {issues.length > 0 && (
+          {unshown.length > 0 && (
             <ul>
-              {issues.map((issue) => (
-                <li>
-                  <code>{issue.path || "/"}</code> {issueMessage(issue)}
-                </li>
+              {unshown.map((issue) => (
+                <IssueItem issue={issue} />
               ))}
             </ul>
           )}
@@ -57,7 +74,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
 
       <label class="field">
         <span class="field-label">{t("fieldName")}</span>
-        <input value={draft.name} onInput={(e) => update({ name: e.currentTarget.value })} />
+        <input value={draft.name} onInput={(e) => update({ name: e.currentTarget.value })} {...invalid("name")} />
         {fieldIssues("name")}
       </label>
       <p class="rule-id">
@@ -87,6 +104,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                   class="mono"
                   value={condition.pattern}
                   onInput={(e) => updateCondition(index, { pattern: e.currentTarget.value })}
+                  {...invalid(`match.${index}.pattern`, `match.${index}`)}
                 />
               </label>
               <button
@@ -112,6 +130,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                       placeholder={t("queryVariable")}
                       aria-label={t("queryVariable")}
                       value={query.variable}
+                      {...invalid(`match.${index}.query`)}
                       onInput={(e) =>
                         updateCondition(index, {
                           query: condition.query.map((q, i) =>
@@ -126,6 +145,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                       placeholder={t("queryParam")}
                       aria-label={t("queryParam")}
                       value={query.param}
+                      {...invalid(`match.${index}.query`)}
                       onInput={(e) =>
                         updateCondition(index, {
                           query: condition.query.map((q, i) => (i === queryIndex ? { ...q, param: e.currentTarget.value } : q)),
@@ -148,7 +168,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
                 >
                   {t("addQuery")}
                 </button>
-                <FieldIssues issues={issues.filter((issue) => issue.path.startsWith(`match.${index}.query`))} />
+                {fieldIssues(`match.${index}.query`)}
               </div>
             )}
 
@@ -156,6 +176,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
               <input
                 type="checkbox"
                 checked={condition.documentTitleFallback}
+                {...invalid(`match.${index}.documentTitleFallback`)}
                 onChange={(e) => updateCondition(index, { documentTitleFallback: e.currentTarget.checked })}
               />
               {t("fieldFallback")}
@@ -174,7 +195,7 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
         addLabel={t("addSelector")}
         values={draft.selectors}
         path="title.selectors"
-        issues={issues}
+        issuesFor={issuesFor}
         onChange={(selectors) => update({ selectors })}
       />
       <StringList
@@ -183,18 +204,18 @@ export function RuleForm({ initial, isNew, onSave, onCancel }: Props) {
         addLabel={t("addStrip")}
         values={draft.documentTitleStrip}
         path="title.documentTitleStrip"
-        issues={issues}
+        issuesFor={issuesFor}
         onChange={(documentTitleStrip) => update({ documentTitleStrip })}
       />
 
       <label class="field">
         <span class="field-label">{t("fieldLabel")}</span>
-        <input class="mono" value={draft.label} onInput={(e) => update({ label: e.currentTarget.value })} />
+        <input class="mono" value={draft.label} onInput={(e) => update({ label: e.currentTarget.value })} {...invalid("label")} />
         {fieldIssues("label")}
       </label>
       <label class="field">
         <span class="field-label">{t("fieldUrl")}</span>
-        <input class="mono" value={draft.url} onInput={(e) => update({ url: e.currentTarget.value })} />
+        <input class="mono" value={draft.url} onInput={(e) => update({ url: e.currentTarget.value })} {...invalid("url")} />
         {fieldIssues("url")}
       </label>
       <p class="help">{t("templateHelp")}</p>
@@ -217,31 +238,36 @@ type StringListProps = {
   addLabel: string;
   values: string[];
   path: string;
-  issues: Issue[];
+  issuesFor: (key: string) => Issue[];
   onChange: (values: string[]) => void;
 };
 
-function StringList({ legend, help, addLabel, values, path, issues, onChange }: StringListProps) {
+function StringList({ legend, help, addLabel, values, path, issuesFor, onChange }: StringListProps) {
   return (
     <fieldset>
       <legend>{legend}</legend>
       <p class="help">{help}</p>
-      {values.map((value, index) => (
-        <>
-          <div class="row">
-            <input
-              class="mono grow"
-              aria-label={legend}
-              value={value}
-              onInput={(e) => onChange(values.map((v, i) => (i === index ? e.currentTarget.value : v)))}
-            />
-            <button type="button" class="secondary" onClick={() => onChange(values.filter((_, i) => i !== index))}>
-              {t("remove")}
-            </button>
-          </div>
-          <FieldIssues issues={issues.filter((issue) => issue.path === `${path}.${index}`)} />
-        </>
-      ))}
+      {values.map((value, index) => {
+        const key = `${path}.${index}`;
+        const itemIssues = issuesFor(key);
+        return (
+          <>
+            <div class="row">
+              <input
+                class="mono grow"
+                aria-label={legend}
+                value={value}
+                onInput={(e) => onChange(values.map((v, i) => (i === index ? e.currentTarget.value : v)))}
+                {...(itemIssues.length > 0 ? { "aria-invalid": true, "aria-describedby": issuesId(key) } : {})}
+              />
+              <button type="button" class="secondary" onClick={() => onChange(values.filter((_, i) => i !== index))}>
+                {t("remove")}
+              </button>
+            </div>
+            <FieldIssues id={issuesId(key)} issues={itemIssues} />
+          </>
+        );
+      })}
       <button type="button" class="secondary" onClick={() => onChange([...values, ""])}>
         {addLabel}
       </button>
@@ -249,13 +275,56 @@ function StringList({ legend, help, addLabel, values, path, issues, onChange }: 
   );
 }
 
-function FieldIssues({ issues }: { issues: Issue[] }) {
+function FieldIssues({ id, issues }: { id: string; issues: Issue[] }) {
   if (issues.length === 0) return null;
   return (
-    <ul class="field-issues">
+    <ul class="field-issues" id={id}>
       {issues.map((issue) => (
-        <li>{issueMessage(issue)}</li>
+        <li>
+          {issueMessage(issue, t)}
+          {issue.detail && <IssueDetail detail={issue.detail} />}
+        </li>
       ))}
     </ul>
   );
+}
+
+export function IssueItem({ issue, ruleNames }: { issue: Issue; ruleNames?: readonly string[] }) {
+  const location = issueLocation(issue, t, ruleNames);
+  const message = issueMessage(issue, t);
+  return (
+    <li>
+      {location ? t("issueWithLocation", [location, message]) : message}
+      {issue.detail && <IssueDetail detail={issue.detail} />}
+    </li>
+  );
+}
+
+// ブラウザやライブラリの英語の説明は翻訳せず、手がかりとして添える
+function IssueDetail({ detail }: { detail: string }) {
+  return (
+    <small class="issue-detail">
+      {t("issueDetail")}: <code>{detail}</code>
+    </small>
+  );
+}
+
+const issuesId = (key: string) => `issues-${key}`;
+
+// フォームに表示場所がある欄のキー。これ以外のエラーは上部の要約に出す
+function fieldKeys(draft: RuleDraft): Set<string> {
+  return new Set([
+    "name",
+    "match",
+    "label",
+    "url",
+    ...draft.match.flatMap((condition, index) => [
+      `match.${index}`,
+      `match.${index}.pattern`,
+      `match.${index}.documentTitleFallback`,
+      ...(condition.type === "urlpattern" ? [`match.${index}.query`] : []),
+    ]),
+    ...draft.selectors.map((_, index) => `title.selectors.${index}`),
+    ...draft.documentTitleStrip.map((_, index) => `title.documentTitleStrip.${index}`),
+  ]);
 }

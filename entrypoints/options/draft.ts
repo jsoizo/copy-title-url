@@ -112,6 +112,6 @@ export function draftIssues(draft: RuleDraft): Issue[] {
     if (condition.type !== "urlpattern") return [];
     const names = condition.query.map((query) => query.variable);
     const duplicated = [...new Set(names.filter((name, i) => names.indexOf(name) !== i))];
-    return duplicated.map((name): Issue => ({ path: `match.${index}.query`, code: "duplicateVariable", detail: name }));
+    return duplicated.map((name): Issue => ({ path: `match.${index}.query`, code: "duplicateVariable", value: name }));
   });
 }

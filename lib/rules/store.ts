@@ -58,7 +58,7 @@ export function resolveEntries(stored: StoredData, builtins: readonly Rule[] = B
     const issues: Issue[] = !result.ok
       ? result.issues
       : result.value.id !== id
-        ? [{ path: "id", code: "idMismatch", detail: id }]
+        ? [{ path: "id", code: "idMismatch", value: id }]
         : [];
     if (issues.length > 0) console.error(`invalid rule in storage: ${id}`, issues);
     entries.set(id, {

@@ -15,11 +15,11 @@ import {
 } from "../../lib/rules/store";
 import { type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft, toDraft } from "./draft";
-import { isValidSelector, issueMessage, type MessageKey, t } from "./i18n";
-import { RuleForm } from "./RuleForm";
+import { isValidSelector, type MessageKey, t } from "./i18n";
+import { IssueItem, RuleForm } from "./RuleForm";
 
 type Editing = { draft: RuleDraft; isNew: boolean } | null;
-type Notice = { kind: "success" | "error"; message: string; issues?: Issue[] } | null;
+type Notice = { kind: "success" | "error"; message: string; issues?: Issue[]; ruleNames?: string[] } | null;
 
 const KIND_LABEL: Record<RuleEntry["kind"], MessageKey> = {
   builtin: "kindBuiltin",
@@ -146,12 +146,13 @@ export function App() {
     try {
       parsed = JSON.parse(await file.text());
     } catch (error) {
-      setNotice({ kind: "error", message: t("importFailed"), issues: [{ path: "", code: "invalidJson", detail: String(error) }] });
+      const detail = error instanceof Error ? error.message : String(error);
+      setNotice({ kind: "error", message: t("importFailed"), issues: [{ path: "", code: "invalidJson", detail }] });
       return;
     }
     const result = validateExport(parsed, { isValidSelector });
     if (!result.ok) {
-      setNotice({ kind: "error", message: t("importFailed"), issues: result.issues });
+      setNotice({ kind: "error", message: t("importFailed"), issues: result.issues, ruleNames: ruleNamesOf(parsed) });
       return;
     }
     if (!confirm(t("confirmImport"))) return;
@@ -178,9 +179,7 @@ export function App() {
           {notice.issues && (
             <ul>
               {notice.issues.map((issue) => (
-                <li>
-                  <code>{issue.path || "/"}</code> {issueMessage(issue)}
-                </li>
+                <IssueItem issue={issue} ruleNames={notice.ruleNames} />
               ))}
             </ul>
           )}
@@ -328,6 +327,16 @@ export function App() {
 
 function editableDraft(entry: RuleEntry): RuleDraft {
   return entry.rule ? toDraft(entry.rule) : looseDraft(entry.raw, entry.id);
+}
+
+// 検証を通らなかったファイルからも、エラーの場所を示すためにルールの名前だけを拾う
+function ruleNamesOf(data: unknown): string[] {
+  const rules = (data as { rules?: unknown } | null)?.rules;
+  if (!Array.isArray(rules)) return [];
+  return rules.map((rule) => {
+    const name = (rule as { name?: unknown } | null)?.name;
+    return typeof name === "string" ? name : "";
+  });
 }
 
 function quotaMessage(error: unknown): string | null {

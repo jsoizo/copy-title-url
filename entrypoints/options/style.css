@@ -251,6 +251,17 @@ table.rules tr.drop-after td {
   font-size: 13px;
 }
 
+.issue-detail {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
 .actions {
   display: flex;
   gap: 8px;

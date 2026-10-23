@@ -200,8 +200,41 @@
   "quotaTotalTooLarge": {
     "message": "The settings exceed the storage limit (100 KB)."
   },
+  "issue_titleInUrl": {
+    "message": "{title} cannot be used in the URL template"
+  },
+  "issue_noTitleSource": {
+    "message": "A rule without selectors must allow the page title"
+  },
   "issue_invalidValue": {
     "message": "Invalid value"
+  },
+  "issue_invalidType": {
+    "message": "Wrong type of value"
+  },
+  "issue_unknownKey": {
+    "message": "Unknown field \"$VALUE$\"",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_invalidConditionType": {
+    "message": "Unsupported condition type \"$VALUE$\". Use urlpattern or regex",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_unsupportedVersion": {
+    "message": "Unsupported format version $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_required": {
     "message": "Required"
@@ -210,45 +243,195 @@
     "message": "Add at least one item"
   },
   "issue_invalidId": {
-    "message": "Invalid rule ID"
+    "message": "A rule ID can contain only lowercase letters, digits, and -"
   },
   "issue_invalidVariableName": {
-    "message": "Invalid variable name"
+    "message": "A variable name must start with a letter, _, or $$ and contain only letters, digits, _, and $$"
   },
   "issue_invalidUrlPattern": {
-    "message": "Invalid URLPattern"
+    "message": "Not a valid URLPattern"
   },
   "issue_invalidRegex": {
-    "message": "Invalid regular expression"
+    "message": "Not a valid regular expression"
   },
   "issue_invalidSelector": {
-    "message": "Invalid CSS selector"
+    "message": "Not a valid CSS selector"
   },
-  "issue_invalidTemplate": {
-    "message": "Invalid template"
+  "issue_templateInvalidPlaceholder": {
+    "message": "The { at character $VALUE$ is not closed or does not contain a valid variable name. Write {{ for a literal {",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "issue_templateUnmatchedBrace": {
+    "message": "The } at character $VALUE$ has no matching {. Write }} for a literal }",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_reservedVariable": {
-    "message": "This variable name is reserved"
+    "message": "$VALUE$ is a reserved variable name and cannot be captured",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_duplicateVariable": {
-    "message": "The same variable is captured twice"
+    "message": "The variable $VALUE$ is captured twice",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_undefinedVariable": {
-    "message": "Not captured by every condition"
-  },
-  "issue_titleInUrl": {
-    "message": "{title} cannot be used in the URL template"
-  },
-  "issue_noTitleSource": {
-    "message": "A rule without selectors must allow the page title"
+    "message": "The variable $VALUE$ is not captured by every condition",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_duplicateRuleId": {
-    "message": "Duplicate rule ID"
+    "message": "The rule ID $VALUE$ is used more than once",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_idMismatch": {
-    "message": "Does not match the ID the rule is stored under"
+    "message": "Does not match the ID the rule is stored under ($VALUE$)",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_invalidJson": {
     "message": "Not valid JSON"
+  },
+  "issueDetail": {
+    "message": "Details"
+  },
+  "issueWithLocation": {
+    "message": "$LOCATION$: $MESSAGE$",
+    "placeholders": {
+      "location": {
+        "content": "$1"
+      },
+      "message": {
+        "content": "$2"
+      }
+    }
+  },
+  "loc_id": {
+    "message": "Rule ID"
+  },
+  "loc_title": {
+    "message": "Title"
+  },
+  "loc_condition": {
+    "message": "URL condition $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionType": {
+    "message": "Type of URL condition $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionPattern": {
+    "message": "Pattern of URL condition $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionQuery": {
+    "message": "Query parameters of URL condition $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_conditionFallback": {
+    "message": "Page title fallback of URL condition $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_selector": {
+    "message": "Title selector $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_strip": {
+    "message": "Page title pattern $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_version": {
+    "message": "Format version"
+  },
+  "loc_order": {
+    "message": "Rule order"
+  },
+  "loc_disabled": {
+    "message": "Disabled rules"
+  },
+  "loc_rules": {
+    "message": "Rules"
+  },
+  "loc_rule": {
+    "message": "rule $INDEX$ (\"$NAME$\")",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      },
+      "name": {
+        "content": "$2"
+      }
+    }
+  },
+  "loc_ruleWithoutName": {
+    "message": "rule $INDEX$",
+    "placeholders": {
+      "index": {
+        "content": "$1"
+      }
+    }
+  },
+  "loc_inRule": {
+    "message": "$FIELD$ in $RULE$",
+    "placeholders": {
+      "rule": {
+        "content": "$1"
+      },
+      "field": {
+        "content": "$2"
+      }
+    }
   }
 }
