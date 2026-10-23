@@ -29,13 +29,13 @@
     "icons": "for size in 16 32 48 128; do rsvg-convert -w $size -h $size assets/icon.svg -o public/icon/$size.png; done"
   },
   "dependencies": {
-    "preact": "10.29.8",
-    "valibot": "1.2.0"
+    "preact": "11.0.1",
+    "valibot": "1.5.0"
   },
   "devDependencies": {
-    "@preact/preset-vite": "2.10.2",
+    "@preact/preset-vite": "2.10.6",
     "@types/node": "^24.19.2",
-    "@valibot/to-json-schema": "1.5.0",
+    "@valibot/to-json-schema": "1.8.0",
     "typescript": "5.9.3",
     "vitest": "4.1.11",
     "wxt": "0.21.4"
