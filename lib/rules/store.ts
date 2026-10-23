@@ -121,6 +121,11 @@ export async function setOrder(order: string[]): Promise<void> {
   await write(stored, { [SETTINGS_KEY]: { ...stored.settings, order } }, []);
 }
 
+// ページを閉じる途中では読み直す応答を待てないため、手元の設定に並び順を重ねてすぐ書き込む
+export function writeOrderNow(settings: Settings, order: string[]): Promise<void> {
+  return browser.storage.sync.set({ [SETTINGS_KEY]: { ...settings, order } });
+}
+
 // 未編集の組み込みは含めない。読み込んだ先でも組み込みの最新定義に追従させるため
 export function buildExport(stored: StoredData): ExportData {
   const entries = resolveEntries(stored);

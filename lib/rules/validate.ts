@@ -149,9 +149,12 @@ function checkRule(rule: Rule, { isValidSelector }: ValidateOptions): Issue[] {
   return issues;
 }
 
-// どの値が入っても形が変わらないよう、変数には仮の値を入れて展開する
+// 変数には、ホスト、ポート、パスのどこに入っても URL として解釈できる仮の値を入れて展開する
 function producesAbsoluteUrl(template: string, variables: readonly string[]): boolean {
-  const sample = Object.fromEntries(variables.map((name) => [name, "x"]));
+  // 取り出した値で始まるテンプレート（正規化済みの URL を丸ごと取り出すなど）は、形を判断できないので通す
+  const first = variables[0];
+  if (first !== undefined && !RESERVED_VARIABLES.includes(first) && template.startsWith(`{${first}}`)) return true;
+  const sample = Object.fromEntries(variables.map((name) => [name, "1"]));
   try {
     const url = new URL(renderTemplate(template, { ...sample, host: "example.com", origin: "https://example.com" }));
     return url.protocol === "http:" || url.protocol === "https:";
@@ -175,11 +178,13 @@ const isIssueCode = (value: unknown): value is IssueCode => ISSUE_CODES.includes
 function toIssue(issue: v.BaseIssue<unknown>): Issue {
   const path = v.getDotPath(issue) ?? "";
   if (issue.message === "tooLong") return { path, code: "tooLong", value: String(issue.requirement) };
+  if (issue.message === "invalidVariableName") return { path, code: "invalidVariableName", value: String(issue.input) };
   if (isIssueCode(issue.message)) return { path, code: issue.message };
-  if (issue.type === "strict_object") return { path, code: "unknownKey", value: String(issue.input) };
-  if (issue.type === "variant") return { path, code: "invalidConditionType", value: String(issue.input) };
-  if (issue.type === "literal") return { path, code: "unsupportedVersion", value: String(issue.input) };
+  // valibot はキーが無い場合も strict_object や variant の issue を返すため、値が無いことを先に判定する
   if (issue.kind === "schema" && issue.input === undefined) return { path, code: "required" };
+  if (issue.type === "strict_object" && issue.expected === "never") return { path, code: "unknownKey", value: String(issue.input) };
+  if (issue.type === "variant" && typeof issue.input === "string") return { path, code: "invalidConditionType", value: issue.input };
+  if (issue.type === "literal") return { path, code: "unsupportedVersion", value: String(issue.input) };
   if (issue.kind === "schema") return { path, code: "invalidType", detail: `Expected ${issue.expected}, received ${issue.received}` };
   return { path, code: "invalidValue", detail: issue.message };
 }

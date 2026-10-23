@@ -9,6 +9,8 @@ export type Toast = {
 export const TOAST_TITLE_NOT_FOUND: Toast = { kind: "error", messageKey: "toastTitleNotFound" };
 export const TOAST_COPY_FAILED: Toast = { kind: "error", messageKey: "toastCopyFailed" };
 export const TOAST_FAILED: Toast = { kind: "error", messageKey: "toastFailed" };
+// ポップアップの記録はポップアップを閉じると消えるため、Service Worker のコンソールを案内しない
+export const POPUP_FAILED: Toast = { kind: "error", messageKey: "popupFailed" };
 
 export const toastAfterCopy = (toast: Toast, copied: boolean): Toast => (copied ? toast : TOAST_COPY_FAILED);
 

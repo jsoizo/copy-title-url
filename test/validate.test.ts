@@ -12,6 +12,12 @@ const base: Rule = {
   url: "https://{host}/items/{id}",
 };
 
+const without = <T extends object>(value: T, key: keyof T): unknown => {
+  const copy = { ...value };
+  delete copy[key];
+  return copy;
+};
+
 const issuesOf = (input: unknown, options = {}): Pick<Issue, "path" | "code">[] => {
   const result = validateRule(input, options);
   return result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }));
@@ -27,7 +33,10 @@ describe("validateRule", () => {
     ["条件が 0 件", { ...base, match: [] }, [{ path: "match", code: "atLeastOne" }]],
     ["ID の形式", { ...base, id: "User 1" }, [{ path: "id", code: "invalidId" }]],
     ["未知のフィールド", { ...base, extra: 1 }, [{ path: "extra", code: "unknownKey" }]],
-    ["必須のフィールドが無い", { ...base, label: undefined }, [{ path: "label", code: "required" }]],
+    ["必須のフィールドが無い", without(base, "label"), [{ path: "label", code: "required" }]],
+    ["条件の種類が無い", { ...base, match: [{ pattern: "x" }] }, [{ path: "match.0.type", code: "required" }]],
+    ["オブジェクトの位置にオブジェクト以外", { ...base, title: "h1" }, [{ path: "title", code: "invalidType" }]],
+    ["条件がオブジェクトでない", { ...base, match: [1] }, [{ path: "match.0", code: "invalidType" }]],
     ["型が違う", { ...base, name: 3 }, [{ path: "name", code: "invalidType" }]],
     [
       "条件の種類が不正",
@@ -87,6 +96,7 @@ describe("validateRule", () => {
     ["セレクタが空白だけ", { ...base, title: { selectors: [" "] } }, [{ path: "title.selectors.0", code: "required" }]],
     ["URL がスキームで始まらない", { ...base, url: "example.com/items/{id}" }, [{ path: "url", code: "urlNotAbsolute" }]],
     ["URL のスキームが http でも https でもない", { ...base, url: "ftp://{host}/{id}" }, [{ path: "url", code: "urlNotAbsolute" }]],
+    ["URL が {host} で始まる", { ...base, url: "{host}/items/{id}" }, [{ path: "url", code: "urlNotAbsolute" }]],
     ["閉じていない波括弧", { ...base, label: "{id" }, [{ path: "label", code: "templateInvalidPlaceholder" }]],
     ["対応しない閉じ波括弧", { ...base, label: "{id}}x}" }, [{ path: "label", code: "templateUnmatchedBrace" }]],
     [
@@ -108,6 +118,19 @@ describe("validateRule", () => {
 
   test("正規表現の文字クラスの中の (?<title> は変数として扱わない", () => {
     const rule = { ...base, match: [{ type: "regex", pattern: String.raw`^https://example\.com/[(?<title>]/(?<id>\d+)` }] };
+    expect(issuesOf(rule)).toEqual([]);
+  });
+
+  test.each([
+    ["ポートを変数にする", "http://localhost::port/items/:id", "http://localhost:{port}/items/{id}"],
+    ["取り出した URL を丸ごと使う", String.raw`^(?<base>https://example\.com/items/\d+)`, "{base}"],
+  ])("URL のテンプレートの検査で正しいテンプレートを弾かない: %s", (_name, pattern, url) => {
+    const type = pattern.startsWith("^") ? "regex" : "urlpattern";
+    expect(issuesOf({ ...base, match: [{ type, pattern }], label: "{title}", url })).toEqual([]);
+  });
+
+  test("エスケープした \\(?<id> は、名前付きグループの重複として数えない", () => {
+    const rule = { ...base, match: [{ type: "regex", pattern: String.raw`^https://example\.com/(?<id>\d+)/\(?<id>` }] };
     expect(issuesOf(rule)).toEqual([]);
   });
 
@@ -202,6 +225,10 @@ describe("validateExport", () => {
   });
 
   test("version が 1 でなければ弾く", () => {
+    expect(validateExport({ order: [], disabled: [], rules: [] })).toEqual({
+      ok: false,
+      issues: [{ path: "version", code: "required" }],
+    });
     expect(validateExport({ version: 2, order: [], disabled: [], rules: [] })).toEqual({
       ok: false,
       issues: [{ path: "version", code: "unsupportedVersion", value: "2" }],

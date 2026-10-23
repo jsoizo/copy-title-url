@@ -37,4 +37,6 @@ test("同じ変数名のクエリが 2 行あれば、詰め替える前に検�
     },
   ];
   expect(draftIssues(draft)).toEqual([{ path: "match.0.query", code: "duplicateVariable", value: "key" }]);
+  draft.match[0]!.query[1]!.variable = " key ";
+  expect(draftIssues(draft)).toEqual([{ path: "match.0.query", code: "duplicateVariable", value: "key" }]);
 });

@@ -27,12 +27,13 @@ const issue = (path: string, code: Issue["code"] = "required"): Issue => ({ path
 describe("issueMessage", () => {
   test("入力した値を文言の中に差し込む", () => {
     const undefinedVariable: Issue = { path: "url", code: "undefinedVariable", value: "key" };
-    expect(issueMessage(undefinedVariable, tJa)).toBe("変数 key は、すべての条件で取り出される変数ではありません");
+    expect(issueMessage(undefinedVariable, tJa)).toBe("変数 key を取り出さない条件があります");
     expect(issueMessage(undefinedVariable, tEn)).toBe("The variable key is not captured by every condition");
   });
 
   test("$$ は $ として表示する", () => {
-    expect(issueMessage(issue("match.0.query.a b", "invalidVariableName"), tEn)).toContain("_, or $ and");
+    const invalidName: Issue = { path: "match.0.query.a b", code: "invalidVariableName", value: "a b" };
+    expect(issueMessage(invalidName, tEn)).toContain("The variable name a b must start with a letter, _, or $ and");
   });
 });
 
@@ -70,7 +71,7 @@ describe("issueLocation", () => {
   test("インポートでは、ルールの番号と名前を添える", () => {
     const pattern = issue("rules.2.match.0.pattern");
     expect(issueLocation(pattern, tJa, ["", "", "My Jira"])).toBe("3 番目のルール「My Jira」、URL の条件 1 のパターン");
-    expect(issueLocation(pattern, tEn, ["", "", "My Jira"])).toBe('Pattern of URL condition 1 in rule 3 ("My Jira")');
+    expect(issueLocation(pattern, tEn, ["", "", "My Jira"])).toBe('Pattern of URL condition 1 in Rule 3 ("My Jira")');
     expect(issueLocation(pattern, tJa)).toBe("3 番目のルール、URL の条件 1 のパターン");
   });
 

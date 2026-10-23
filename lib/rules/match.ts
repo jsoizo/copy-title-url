@@ -114,5 +114,8 @@ function regexGroupNames(pattern: string): string[] {
     return [];
   }
   // | の左右に書いた同じ名前のグループは groups では 1 つにまとまるため、書いた回数だけ数えて重複を検出できるようにする
-  return names.flatMap((name) => Array<string>(Math.max(1, pattern.split(`(?<${name}>`).length - 1)).fill(name));
+  return names.flatMap((name) => {
+    const written = pattern.match(new RegExp(String.raw`(?<!\\)\(\?<${name.replace(/\$/g, "\\$")}>`, "g"))?.length ?? 0;
+    return Array<string>(Math.max(1, written)).fill(name);
+  });
 }

@@ -26,6 +26,9 @@
   "toastFailed": {
     "message": "Could not copy. See the extension's service worker console for details."
   },
+  "popupFailed": {
+    "message": "Could not copy on this page."
+  },
   "optionsTitle": {
     "message": "Copy Title and URL settings"
   },
@@ -257,7 +260,12 @@
     "message": "A rule ID can contain only lowercase letters, digits, and -"
   },
   "issue_invalidVariableName": {
-    "message": "A variable name must start with a letter, _, or $$ and contain only letters, digits, _, and $$"
+    "message": "The variable name $VALUE$ must start with a letter, _, or $$ and contain only letters, digits, _, and $$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_invalidUrlPattern": {
     "message": "Not a valid URLPattern"
@@ -424,7 +432,7 @@
     "message": "Rules"
   },
   "loc_rule": {
-    "message": "rule $INDEX$ (\"$NAME$\")",
+    "message": "Rule $INDEX$ (\"$NAME$\")",
     "placeholders": {
       "index": {
         "content": "$1"
@@ -435,7 +443,7 @@
     }
   },
   "loc_ruleWithoutName": {
-    "message": "rule $INDEX$",
+    "message": "Rule $INDEX$",
     "placeholders": {
       "index": {
         "content": "$1"

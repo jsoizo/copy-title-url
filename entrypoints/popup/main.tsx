@@ -4,7 +4,7 @@ import { browser } from "wxt/browser";
 import { callCopier, prepareCopy } from "../../lib/copy";
 import type { CopyFormat } from "../../lib/format";
 import { setDocumentLanguage, t } from "../../lib/i18n";
-import { TOAST_FAILED, type Toast, toastAfterCopy } from "../../lib/messages";
+import { POPUP_FAILED, type Toast, toastAfterCopy } from "../../lib/messages";
 import { writeClipboard } from "../../lib/page";
 
 function Popup() {
@@ -35,7 +35,7 @@ function Popup() {
     } catch (error) {
       // 注入できないページ（chrome:// など）
       console.error(error);
-      setMessage(TOAST_FAILED);
+      setMessage(POPUP_FAILED);
     } finally {
       setBusy(false);
     }
@@ -47,7 +47,7 @@ function Popup() {
       window.close();
     } catch (error) {
       console.error(error);
-      setMessage(TOAST_FAILED);
+      setMessage(POPUP_FAILED);
     }
   };
 

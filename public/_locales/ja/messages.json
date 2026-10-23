@@ -26,6 +26,9 @@
   "toastFailed": {
     "message": "コピーできませんでした。詳細は拡張機能の Service Worker のコンソールを確認してください"
   },
+  "popupFailed": {
+    "message": "このページではコピーできませんでした"
+  },
   "optionsTitle": {
     "message": "Copy Title and URL の設定"
   },
@@ -257,7 +260,12 @@
     "message": "ルール ID には英小文字、数字、- だけを使えます"
   },
   "issue_invalidVariableName": {
-    "message": "変数名は英字、_、$$ のいずれかで始め、英数字、_、$$ だけを使ってください"
+    "message": "変数名 $VALUE$ は、英字、_、$$ のいずれかで始め、英数字、_、$$ だけを使ってください",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
   },
   "issue_invalidUrlPattern": {
     "message": "URLPattern として解釈できません"
@@ -301,7 +309,7 @@
     }
   },
   "issue_undefinedVariable": {
-    "message": "変数 $VALUE$ は、すべての条件で取り出される変数ではありません",
+    "message": "変数 $VALUE$ を取り出さない条件があります",
     "placeholders": {
       "value": {
         "content": "$1"

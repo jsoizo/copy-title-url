@@ -12,7 +12,9 @@ import {
   saveRule,
   setEnabled,
   setOrder,
+  writeOrderNow,
 } from "../../lib/rules/store";
+import type { Settings } from "../../lib/rules/schema";
 import { duplicateNameIssues, type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft } from "./draft";
 import { type MessageKey, t } from "../../lib/i18n";
@@ -41,7 +43,9 @@ export function App() {
   const focusAfterMove = useRef<number | null>(null);
   // storage.sync は書き込み回数に上限があるため、矢印キーの連打などはまとめて保存する
   const pendingOrder = useRef<string[] | null>(null);
+  const writingOrder = useRef(false);
   const orderTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const lastSettings = useRef<Settings | null>(null);
 
   useEffect(() => {
     if (focusAfterMove.current === null) return;
@@ -53,8 +57,9 @@ export function App() {
 
   const reload = async () => {
     const stored = await readStored();
-    // 保存前の並びを、保存済みの古い並びで上書きしないため
-    if (pendingOrder.current) return;
+    lastSettings.current = stored.settings;
+    // 保存前や保存中の並びを、保存済みの古い並びで上書きしないため
+    if (pendingOrder.current || writingOrder.current) return;
     setEntries(resolveEntries(stored));
   };
 
@@ -64,11 +69,16 @@ export function App() {
     const listener = (_changes: unknown, area: string) => {
       if (area === "sync") reload().catch(showError);
     };
+    const flushWhenHidden = () => {
+      if (document.visibilityState === "hidden") flushOrder();
+    };
     browser.storage.onChanged.addListener(listener);
-    window.addEventListener("pagehide", flushOrder);
+    document.addEventListener("visibilitychange", flushWhenHidden);
+    window.addEventListener("pagehide", flushOrderNow);
     return () => {
       browser.storage.onChanged.removeListener(listener);
-      window.removeEventListener("pagehide", flushOrder);
+      document.removeEventListener("visibilitychange", flushWhenHidden);
+      window.removeEventListener("pagehide", flushOrderNow);
     };
   }, []);
 
@@ -87,7 +97,22 @@ export function App() {
     const order = pendingOrder.current;
     if (!order) return;
     pendingOrder.current = null;
-    run(() => setOrder(order));
+    writingOrder.current = true;
+    run(async () => {
+      try {
+        await setOrder(order);
+      } finally {
+        writingOrder.current = false;
+      }
+    });
+  }
+
+  function flushOrderNow() {
+    clearTimeout(orderTimer.current);
+    const order = pendingOrder.current;
+    if (!order || !lastSettings.current) return;
+    pendingOrder.current = null;
+    writeOrderNow(lastSettings.current, order).catch((error) => console.error(error));
   }
 
   // 保存の完了を待つと行が一瞬元の位置に戻るため、先に画面の並びだけを入れ替える
@@ -122,10 +147,10 @@ export function App() {
   };
 
   const save = async (draft: RuleDraft): Promise<Issue[] | string | null> => {
+    // 1 種類ずつ直させないよう、下書きの検査と検証のエラーをまとめて返す
     const preIssues = draftIssues(draft);
-    if (preIssues.length > 0) return preIssues;
     const result = validateRule(fromDraft(draft), { isValidSelector });
-    if (!result.ok) return result.issues;
+    if (preIssues.length > 0 || !result.ok) return [...preIssues, ...(result.ok ? [] : result.issues)];
     try {
       const others = resolveEntries(await readStored()).flatMap((entry) => (entry.rule ? [entry.rule] : []));
       const nameIssues = duplicateNameIssues(result.value, others);

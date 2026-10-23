@@ -90,7 +90,8 @@ export function looseDraft(raw: unknown, id: string): RuleDraft {
 export function draftIssues(draft: RuleDraft): Issue[] {
   return draft.match.flatMap((condition, index) => {
     if (condition.type !== "urlpattern") return [];
-    const names = condition.query.map((query) => query.variable);
+    // 保存時に前後の空白を削るため、削ったあとの名前で比べる
+    const names = condition.query.map((query) => query.variable.trim());
     const duplicated = [...new Set(names.filter((name, i) => names.indexOf(name) !== i))];
     return duplicated.map((name): Issue => ({ path: `match.${index}.query`, code: "duplicateVariable", value: name }));
   });

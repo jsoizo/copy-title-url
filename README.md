@@ -62,7 +62,7 @@ Rules are evaluated from the top of the list on the settings page. The first rul
 | `title.selectors` | Yes | CSS selectors for the title element, tried in order. With an empty list, the page title is used |
 | `title.documentTitleStrip` | No | Regular expressions removed from the page title whenever it is used. Each one removes only its first match |
 | `label` | Yes | Template for the label |
-| `url` | Yes | Template for the URL. It must produce an absolute URL that starts with `http://` or `https://` |
+| `url` | Yes | Template for the URL. It must produce an absolute URL that starts with `http://` or `https://`, unless it starts with a variable captured by `match` |
 
 Leading and trailing spaces are removed from `name`, URLPattern patterns, query parameters, and selectors. Regular expressions and templates are kept as they are, because spaces can be meaningful there. A value that contains only spaces counts as empty.
 
