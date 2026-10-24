@@ -29,9 +29,11 @@ The extension is not on the Chrome Web Store. Install it from a release:
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the unzipped directory.
 
-Chrome does not update unpacked extensions automatically. To update, replace the contents of the loaded directory with the new release and click the reload button on `chrome://extensions`. Do not remove the extension to update it, and export your rules from the settings page before you remove it.
+Chrome does not update unpacked extensions automatically. For releases with the same ID, replace the contents of the loaded directory with the new release and click the reload button on `chrome://extensions`. Do not remove the extension to update it, and export your rules from the settings page before you remove it.
 
-The extension ID is fixed to `kobigalcccfbbagjhedgeknlnpgmjakp` whichever directory you load it from. After you load it in each browser, your rules sync across browsers signed in to the same Google account with Chrome sync turned on.
+The extension ID is fixed to `nfibbddcoilbgjplanohcjgolkapdaej` whichever directory you load it from. This is the same ID as the Chrome Web Store item, so unpacked builds and the store version share their synced rules. After you load it in each browser, your rules sync across browsers signed in to the same Google account with Chrome sync turned on.
+
+If you installed 0.1.0 from a release, export your rules from its settings page before upgrading. 0.1.1 uses the Chrome Web Store item's ID, so the old unpacked extension and its synced rules are not carried over automatically. After exporting, remove the 0.1.0 build, load 0.1.1, and import the file.
 
 ## Usage
 
@@ -118,17 +120,20 @@ pnpm install
 pnpm build
 ```
 
-Load `.output/chrome-mv3` with **Load unpacked**. A build from source has the same extension ID as a release, so it replaces the release in the same browser and shares its synced rules. `pnpm dev` runs in a separate browser profile and does not affect them.
+Load `.output/chrome-mv3` with **Load unpacked**. A build from source has the same extension ID as the release ZIP and the Chrome Web Store version, so it shares synced rules with them. `pnpm dev` runs in a separate browser profile and does not affect them.
 
 | Command | Description |
 |---|---|
 | `pnpm dev` | Build in watch mode and reload the extension on changes |
 | `pnpm build` | Build into `.output/chrome-mv3` |
-| `pnpm zip` | Build and create the release zip in `.output` |
+| `pnpm zip` | Build and create the release zip in `.output` (includes `manifest.key` for unpacked installs) |
+| `pnpm zip:store` | Build and create the Chrome Web Store zip in `.output` (omits `manifest.key`) |
 | `pnpm test` | Run the unit tests |
 | `pnpm check` | Type-check |
 | `pnpm schema` | Regenerate `schema/rules.schema.json` |
 | `pnpm icons` | Regenerate the PNG icons from `assets/icon.svg` (requires a POSIX shell and `rsvg-convert`) |
+
+The Chrome Web Store rejects `manifest.key`. Use `pnpm zip:store` for store uploads; `pnpm zip` is for GitHub releases and unpacked installs.
 
 ## FAQ
 

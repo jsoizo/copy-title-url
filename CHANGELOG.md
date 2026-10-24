@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-25
+
+### Changed
+
+- The extension ID now matches the Chrome Web Store item. Unpacked builds and the store version share the same extension ID and Chrome sync rules. If you installed 0.1.0 from a release, export your rules before upgrading; the extension ID has changed.
+
+### Fixed
+
+- The Chrome Web Store ZIP is built without the `manifest.key` field, which the store rejects.
+
 ## [0.1.0] - 2026-10-24
 
 First public release.
@@ -22,5 +32,6 @@ First public release.
 - English and Japanese UI.
 - The extension requests only `contextMenus`, `activeTab`, `scripting`, and `storage`, without host permissions.
 
-[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.1
 [0.1.0]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.0
