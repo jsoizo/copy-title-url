@@ -10,7 +10,7 @@ const storeKey =
 export default defineConfig({
   imports: false,
   manifest: {
-    name: "Copy Title and URL",
+    name: "Tidy Title & URL",
     description: "__MSG_extDescription__",
     default_locale: "en",
     ...(process.env.STORE_BUILD ? {} : { key: storeKey }),

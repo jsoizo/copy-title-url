@@ -68,8 +68,8 @@ jobs:
             fi
             gh release upload "$GITHUB_REF_NAME" "${release_assets[@]}" --clobber
           elif [[ -f "$notes" ]]; then
-            gh release create "$GITHUB_REF_NAME" "${release_assets[@]}" --draft --prerelease="$is_prerelease" --title "Copy Title and URL $version" --notes-file "$notes"
+            gh release create "$GITHUB_REF_NAME" "${release_assets[@]}" --draft --prerelease="$is_prerelease" --title "Tidy Title & URL $version" --notes-file "$notes"
           else
-            gh release create "$GITHUB_REF_NAME" "${release_assets[@]}" --draft --prerelease="$is_prerelease" --title "Copy Title and URL $version" --generate-notes
+            gh release create "$GITHUB_REF_NAME" "${release_assets[@]}" --draft --prerelease="$is_prerelease" --title "Tidy Title & URL $version" --generate-notes
           fi
           gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease="$is_prerelease"

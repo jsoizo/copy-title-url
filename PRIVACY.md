@@ -1,8 +1,8 @@
-# Privacy Policy for Copy Title and URL
+# Privacy Policy for Tidy Title & URL
 
-Last updated: October 25, 2026
+Last updated: October 27, 2026
 
-Copy Title and URL is a Chrome extension that copies the title and URL of the current page, formatted by rules you control. This policy explains what the extension does with your data. It applies to the extension and its settings page.
+Tidy Title & URL is a Chrome extension that copies the title and URL of the current page, formatted by rules you control. This policy explains what the extension does with your data. It applies to the extension and its settings page.
 
 ## Summary
 

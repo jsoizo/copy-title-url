@@ -33,7 +33,7 @@
     "message": "このページではコピーできませんでした"
   },
   "optionsTitle": {
-    "message": "Copy Title and URL の設定"
+    "message": "Tidy Title & URL の設定"
   },
   "optionsDescription": {
     "message": "ルールは上から順に評価し、ページの URL に最初に一致したルールでタイトルと URL を整形します。どのルールにも一致しないページでは、ページのタイトルと URL をそのままコピーします。"

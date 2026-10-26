@@ -6,6 +6,6 @@ import { ExportSchema } from "./schema.ts";
 export function buildJsonSchema() {
   return {
     ...toJsonSchema(ExportSchema, { errorMode: "ignore" }),
-    title: "Copy Title and URL rules",
+    title: "Tidy Title & URL rules",
   };
 }

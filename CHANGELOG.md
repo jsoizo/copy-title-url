@@ -1,6 +1,6 @@
 # Changelog
 
-All notable user-visible changes to Copy Title and URL will be documented here.
+All notable user-visible changes to Tidy Title & URL will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- The extension is renamed from Copy Title and URL to Tidy Title & URL, so it can be told apart from another Chrome Web Store item with the same name. Your rules and settings are kept.
 - The extension description now names the sites that have built-in rules (GitHub and Jira), and is shown in Japanese when the browser language is Japanese.
 
 ## [0.1.1] - 2026-10-25

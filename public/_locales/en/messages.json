@@ -33,7 +33,7 @@
     "message": "Could not copy on this page."
   },
   "optionsTitle": {
-    "message": "Copy Title and URL settings"
+    "message": "Tidy Title & URL settings"
   },
   "optionsDescription": {
     "message": "Rules are evaluated from the top. The first rule that matches the page URL formats the copied title and URL. Pages that match no rule are copied with the page title and URL as they are."

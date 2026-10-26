@@ -1,6 +1,6 @@
-# Copy Title and URL
+# Tidy Title & URL
 
-Copy Title and URL is a Chrome extension that copies the title and URL of the current page, cleaned up per site by rules you can edit, without requesting access to your site data.
+Tidy Title & URL is a Chrome extension that copies the title and URL of the current page, cleaned up per site by rules you can edit, without requesting access to your site data.
 
 On a GitHub pull request, for example, it copies `Fix the login form #9000` and `https://github.com/owner/repo/pull/9000` even when you are on `/pull/9000/files?diff=split`.
 
@@ -153,4 +153,4 @@ The extension reads the title element and writes to the clipboard by running a s
 
 ## License
 
-Copy Title and URL is available under the [MIT License](LICENSE).
+Tidy Title & URL is available under the [MIT License](LICENSE).
