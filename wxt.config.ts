@@ -11,6 +11,7 @@ export default defineConfig({
   imports: false,
   manifest: {
     name: "Copy Title and URL",
+    description: "__MSG_extDescription__",
     default_locale: "en",
     ...(process.env.STORE_BUILD ? {} : { key: storeKey }),
     permissions: ["contextMenus", "activeTab", "scripting", "storage"],

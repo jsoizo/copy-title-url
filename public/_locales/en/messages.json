@@ -1,4 +1,7 @@
 {
+  "extDescription": {
+    "message": "Copy the page title and URL, cleaned up by per-site rules. Built-in rules for GitHub and Jira; add your own for other sites."
+  },
   "menuParent": {
     "message": "Copy title and URL"
   },

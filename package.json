@@ -1,7 +1,7 @@
 {
   "name": "copy-title-url",
   "version": "0.1.1",
-  "description": "Copy the title and URL of the current page, formatted per site with configurable rules.",
+  "description": "Copy the page title and URL, cleaned up by per-site rules. Built-in rules for GitHub and Jira; add your own for other sites.",
   "license": "MIT",
   "author": "jsoizo",
   "homepage": "https://github.com/jsoizo/copy-title-url#readme",

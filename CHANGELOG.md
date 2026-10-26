@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- The extension description now names the sites that have built-in rules (GitHub and Jira), and is shown in Japanese when the browser language is Japanese.
+
 ## [0.1.1] - 2026-10-25
 
 ### Changed

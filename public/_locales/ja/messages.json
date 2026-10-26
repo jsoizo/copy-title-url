@@ -1,4 +1,7 @@
 {
+  "extDescription": {
+    "message": "ページのタイトルと URL を、サイトごとのルールで整形してコピーします。GitHub と Jira のルールは組み込み済みで、ほかのサイト用のルールも追加できます。"
+  },
   "menuParent": {
     "message": "タイトルと URL をコピー"
   },
