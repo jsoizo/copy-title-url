@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-27
+
 ### Added
 
 - Exported files include `$schema`, which points to the JSON Schema of the installed version, so editors can check and complete rules you write by hand.
@@ -42,6 +44,7 @@ First public release.
 - English and Japanese UI.
 - The extension requests only `contextMenus`, `activeTab`, `scripting`, and `storage`, without host permissions.
 
-[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/jsoizo/copy-title-url/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.2
 [0.1.1]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.1
 [0.1.0]: https://github.com/jsoizo/copy-title-url/releases/tag/v0.1.0

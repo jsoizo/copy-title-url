@@ -1,6 +1,6 @@
 {
   "name": "copy-title-url",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Copy the page title and URL, cleaned up by per-site rules. Built-in rules for GitHub and Jira; add your own for other sites.",
   "license": "MIT",
   "author": "jsoizo",
