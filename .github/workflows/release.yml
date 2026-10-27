@@ -67,6 +67,8 @@ jobs:
             .output/*.zip
             .output/*.zip.sha256
           if-no-files-found: error
+          # WXT writes to .output, and upload-artifact skips paths under hidden directories by default
+          include-hidden-files: true
 
   # Both publish jobs wait on the release environment, so one approval starts them together
   github-release:
