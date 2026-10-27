@@ -127,9 +127,10 @@ export function writeOrderNow(settings: Settings, order: string[]): Promise<void
 }
 
 // 未編集の組み込みは含めない。読み込んだ先でも組み込みの最新定義に追従させるため
-export function buildExport(stored: StoredData): ExportData {
+export function buildExport(stored: StoredData, schemaUrl: string): ExportData {
   const entries = resolveEntries(stored);
   return {
+    $schema: schemaUrl,
     version: 1,
     order: entries.map((entry) => entry.id),
     disabled: entries.filter((entry) => !entry.enabled).map((entry) => entry.id),

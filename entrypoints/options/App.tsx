@@ -18,6 +18,7 @@ import type { Settings } from "../../lib/rules/schema";
 import { duplicateNameIssues, type Issue, validateExport, validateRule } from "../../lib/rules/validate";
 import { draftIssues, fromDraft, looseDraft, newDraft, type RuleDraft } from "./draft";
 import { type MessageKey, t } from "../../lib/i18n";
+import { rulesDocUrl, schemaUrl } from "../../lib/links";
 import { isValidSelector } from "./selector";
 import { IssueItem, RuleForm } from "./RuleForm";
 
@@ -29,6 +30,8 @@ const KIND_LABEL: Record<RuleEntry["kind"], MessageKey> = {
   edited: "kindEdited",
   user: "kindUser",
 };
+
+const manifest = browser.runtime.getManifest();
 
 export function App() {
   const [entries, setEntries] = useState<RuleEntry[] | null>(null);
@@ -167,7 +170,7 @@ export function App() {
   const exportRules = async () => {
     let data: ReturnType<typeof buildExport>;
     try {
-      data = buildExport(await readStored());
+      data = buildExport(await readStored(), schemaUrl(manifest));
     } catch (error) {
       showError(error);
       return;
@@ -340,6 +343,12 @@ export function App() {
       <section>
         <h2>{t("importExportHeading")}</h2>
         <p class="help">{t("importExportHelp")}</p>
+        <p class="help">
+          {t("schemaHelp")}{" "}
+          <a href={rulesDocUrl(manifest)} target="_blank" rel="noreferrer">
+            {t("rulesFormatLink")}
+          </a>
+        </p>
         <div class="actions">
           <button type="button" class="secondary" onClick={exportRules}>
             {t("exportButton")}

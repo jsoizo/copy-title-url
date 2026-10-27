@@ -112,8 +112,9 @@ describe("エクスポートとインポート", () => {
     await saveRule(userRule);
     await saveRule({ ...builtin("jira"), name: "My Jira" });
     await setEnabled("github", false);
-    const exported = buildExport(await readStored());
+    const exported = buildExport(await readStored(), "https://example.com/rules.schema.json");
     expect(exported).toEqual({
+      $schema: "https://example.com/rules.schema.json",
       version: 1,
       order: ["github", "jira", "user-1"],
       disabled: ["github"],

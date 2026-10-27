@@ -95,6 +95,12 @@
   "importExportHelp": {
     "message": "Export saves custom rules, edited built-in rules, the order, and enabled states. Unedited built-in rules are not included. Import replaces all current settings."
   },
+  "schemaHelp": {
+    "message": "Exported files reference the JSON Schema, so editors can check and complete rules you write by hand."
+  },
+  "rulesFormatLink": {
+    "message": "Rule format"
+  },
   "exportButton": {
     "message": "Export"
   },

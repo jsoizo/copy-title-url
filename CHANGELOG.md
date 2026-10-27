@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Exported files include `$schema`, which points to the JSON Schema of the installed version, so editors can check and complete rules you write by hand.
+- The settings page links to the rule format in the README.
+
 ### Changed
 
 - The extension is renamed from Copy Title and URL to Tidy Title & URL, so it can be told apart from another Chrome Web Store item with the same name. Your rules and settings are kept.

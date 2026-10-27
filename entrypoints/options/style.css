@@ -198,6 +198,10 @@ table.rules tr.drop-after td {
   font-size: 13px;
 }
 
+.help a {
+  color: var(--accent);
+}
+
 .rule-form fieldset {
   margin: 16px 0;
   padding: 12px 16px;

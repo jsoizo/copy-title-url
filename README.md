@@ -107,7 +107,7 @@ This rule copies issues from a self-hosted Jira with a regular expression:
 }
 ```
 
-Exported files contain your own rules, the built-in rules you edited, the order of the list, and which rules are disabled. Unedited built-in rules are left out, so they keep following updates to the extension. To import a rule written by hand, put it in the `rules` array of an exported file. The format is described by [`schema/rules.schema.json`](schema/rules.schema.json). Importing a file replaces all current settings.
+Exported files contain your own rules, the built-in rules you edited, the order of the list, and which rules are disabled. Unedited built-in rules are left out, so they keep following updates to the extension. To import a rule written by hand, put it in the `rules` array of an exported file. The format is described by [`schema/rules.schema.json`](schema/rules.schema.json). Exported files point to this schema in the release tag of the installed version through `$schema`, so editors such as VS Code can check and complete rules you write by hand. Importing a file replaces all current settings.
 
 ## Build from source
 
