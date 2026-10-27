@@ -34,6 +34,7 @@
     "valibot": "1.5.0"
   },
   "devDependencies": {
+    "@googleapis/chromewebstore": "7.0.0",
     "@preact/preset-vite": "2.10.6",
     "@types/node": "^24.19.2",
     "@valibot/to-json-schema": "1.8.0",
