@@ -129,7 +129,7 @@ jobs:
     env:
       CWS_PUBLISHER_ID: b111937e-4d20-4c19-aefb-951207027b54
       CWS_EXTENSION_ID: nfibbddcoilbgjplanohcjgolkapdaej
-      WORKLOAD_IDENTITY_PROVIDER: projects/665397681090/locations/global/workloadIdentityPools/github/providers/copy-title-url
+      WORKLOAD_IDENTITY_PROVIDER: projects/665397681090/locations/global/workloadIdentityPools/github/providers/github
       SERVICE_ACCOUNT: cws-publisher@tidy-title-url.iam.gserviceaccount.com
 
     steps:
